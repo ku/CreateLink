@@ -1,0 +1,10 @@
+
+all:  clipboard.def clipboard.cpp
+	cl /D "WIN32" /D "_WINDOWS" /D "XP_WIN32" /D "MOZILLA_STRICT_API" /D "XPCOM_GLUE" /D "XP_WIN" /D "_X86_" /D "_WINDLL" /D "_UNICODE" /D "UNICODE"  /W3 /c  /Gd /TP /I ./include .\clipboard.cpp
+	link /OUT:"clipboard.dll" /INCREMENTAL /DLL  /DEF:"clipboard.def"  /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X86 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib clipboard.obj clipboard.res
+
+	cp clipboard.dll test/
+
+clipboard.res: clipboard.rs
+	rs clipboard.rs
+	

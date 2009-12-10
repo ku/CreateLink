@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Create Link</title>
+</head>
+<script type="text/javascript" charset="utf-8">
+// <![CDATA[
+  chrome.self.onConnect.addListener( function(port) {
+			port.onMessage.addListener( function(message, connection) {
+				console.log(message);
+				if ( message.command == 'setClipboard' ) {
+					document.getElementById('clipboard_object').set(message.data);
+				}
+			} );
+	} );
+	
+// ]]>
+</script>
+<body>
+<object id="clipboard_object" type="application/x-chrome-npapi-clipboard">Create Link Plugin failed to load</object>
+</body>
+</html>

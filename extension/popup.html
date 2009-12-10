@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Create Link browser action popup</title>
+<style>
+
+* {
+	cursor: pointer;
+}
+
+body, ol {
+	margin: 0;
+	padding: 0;
+}
+
+li:hover {
+	background-color: rgb(227,227,227);
+}
+
+li {
+	padding: 4px 8px;
+	margin: 2px;
+	font-family: 'Arial';
+	font-size: small;
+	white-space: nowrap;
+	border-radius: 4px;
+}
+</style>
+<script type="text/javascript" charset="utf-8">
+// <![CDATA[
+	function onMenuSelected(tab, id) {
+				chrome.self.getBackgroundPage().console.log(tab, id);
+		var connection = chrome.extension.connect();
+		if (id == 'plain') {
+			connection.postMessage({
+				command: 'setClipboard',
+				data: tab.title + " " + tab.url
+			} );
+		} else if (id == 'html') {
+			var title = tab.title;
+			title = title.replace(/</, "&lt;");
+			title = title.replace(/>/, "&gt;");
+			connection.postMessage({
+				command: 'setClipboard',
+				data: '<a href="'+ tab.url +'">' + title + '</a>'
+			} );
+		}
+	}
+	document.addEventListener( 'mouseup', function (ev) {
+		chrome.windows.getCurrent(function (w) {
+				chrome.self.getBackgroundPage().console.log(w);
+			chrome.tabs.getSelected(w.id, function (t) {
+				chrome.self.getBackgroundPage().console.log(t);
+				onMenuSelected(t, ev.target.id);
+				window.close();
+			});
+		});
+	}, false);
+	// ]]>
+	</script>
+</head>
+<body >
+
+<ol>
+<li id="plain">Plain text</li>
+<li id="html">HTML</li>
+</ol>
+</body>
+</html>
