@@ -1,0 +1,122 @@
+thead td {
+padding: 4px;
+				 padding-left: 20px;
+				 padding-right: 20px;
+				 font-weight: bold;
+				 background-color: #ccc;
+border: 1px solid #999;
+				border-spacing: 0;
+				border-collapse: collapse;
+				text-align: center;
+}
+ 
+table {
+border: 1px solid #999;
+				border-collapse: collapse;
+				border-spacing: 0;
+}
+ 
+tbody td {
+	border-right: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+	padding: 4px;
+}
+ 
+#column-name {
+width: 100px;
+}
+#column-format {
+width: 500px;
+}
+ 
+.plus-minus-buttons {
+	margin-top: 5px;
+	font-size: 120%;
+	clear: both;
+}
+.plus-minus-buttons .button {
+	width: 1em;
+	height: 1em;
+	border: 1px solid #666;
+	text-align: center;
+}
+ 
+.plus-minus-buttons .button:active {
+	background: #999;
+}
+ 
+.plus-minus-buttons .plus {
+	float: left;
+}
+.plus-minus-buttons .minus {
+	float: left;
+	border-left: 0 none;
+}
+/*
+table.cocoatable tbody tr:hover {
+	background: rgb(161,197,255);
+}
+*/
+table.cocoatable tbody tr.selected {
+	background: rgb(161,197,255);
+}
+ 
+table.cocoatable td.editing {
+	background: white;
+	outline: 1px solid rgb(75,137,208);
+}
+ 
+table.cocoatable input {
+	border: 0 none;
+	outline: 0px none ;
+	padding: 0;
+	margin: 0;
+}
+ 
+ 
+ul  {
+	list-style-type: none;
+}
+img.icon {
+	display: block;
+	float: left;
+}
+
+h1 {
+	margin: 16px;
+}
+
+h2 {
+	margin-top: 25px;
+}
+
+thead td {
+	padding: 4px;
+	padding-left: 20px;
+	padding-right: 20px;
+	font-weight: bold;
+	background-color: #ccc;
+	border: 1px solid #999;
+  border-spacing: 0;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+table {
+	border: 1px solid #999;
+	  border-collapse: collapse;
+    border-spacing: 0;
+}
+
+tbody td {
+ border-right: 1px solid #ccc;
+ border-bottom: 1px solid #ccc;
+ padding: 4px;
+}
+ 
+ #column-name {
+ 	width: 100px;
+ }
+ #column-format {
+ 	width: 500px;
+ }

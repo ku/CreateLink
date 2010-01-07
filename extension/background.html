@@ -6,17 +6,59 @@
 </head>
 <script type="text/javascript" charset="utf-8">
 // <![CDATA[
+	var useNPAPI = false;
+	
   chrome.self.onConnect.addListener( function(port) {
 			port.onMessage.addListener( function(message, connection) {
 				console.log(message);
 				if ( message.command == 'setClipboard' ) {
-					document.getElementById('clipboard_object').set(message.data);
+					var proxy = document.getElementById('clipboard_object');
+					if ( useNPAPI )
+						proxy.set(message.data);
+					else {
+						proxy.value = message.data;
+						proxy.select();
+						document.execCommand("copy");
+					}
+						
 				}
 			} );
 	} );
+  function CreateLink() {
+		var self = this;
+		this.__defineGetter__( "formats", function () {
+			return self.readFormats();
+		} );
+  }
+  CreateLink.default_formats = [
+      {label: "Plain text", format: '%text% %url%' },
+      {label: "HTML", format: '<a href="%url%">%text%</a>' },
+  ];
+  CreateLink.prototype.readFormats = function () {
+		var formats;
+    try {
+      formats = JSON.parse( localStorage.format_preferences );
+    } catch(e) {
+    }
+    if ( !formats ) {
+      formats = CreateLink.default_formats;
+    }
+		return formats;
+  }
+  
+function instance() {
+	if ( !window.__instance ) {
+		window.__instance = new CreateLink();
+	}
+	return window.__instance;
+}
+
 // ]]>
 </script>
 <body>
+<!--
 <object id="clipboard_object" type="application/x-chrome-npapi-clipboard">Create Link Plugin failed to load</object>
+-->
+<input type="text" id="clipboard_object" />
 </body>
 </html>

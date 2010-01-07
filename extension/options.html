@@ -2,21 +2,63 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Create Link</title>
-<style>
-ul  {
-	list-style-type: none;
-}
-</style>
+<title>Options - Create Link</title>
+    <link rel="stylesheet" type="text/css" href="./options.css" media="all" />
+        	<script type="text/javascript" charset="utf-8" src="cocoatable.js"></script>
+	<script type="text/javascript" charset="utf-8"> 
+	// <![CDATA[
+ 
+	window.addEventListener( 'load', function () {
+		var localStorageKey = 'format_preferences';
+		var formats = chrome.self.getBackgroundPage().instance().formats;
+		try{
+			var ctable	= new CocoaTable(formats, [
+				'label', 'format'
+			] );
+			ctable._listener.onUpdated = function () {
+				var json = ctable.serialize();
+				localStorage[localStorageKey] = json;
+			}
+			window.ctable = ctable;
+			}catch(e){
+				console.log(e)
+			}
+	}, false);
+// ]]>
+</script> 
 </head>
 <body>
-	<img src="icon128.png" />
-	<h1>Create Link</h1>		
-	<ul>
-	<li>developped by <a href="http://ido.nu/kuma/">ku</a></li>
-	<li>
-	icons by <a href="http://icontoaster.com/?free-icons-for-all">icontoaster.com</a> </li>
-	</ul>
-	Firefox addon <a href="https://addons.mozilla.org/en/firefox/addon/142">MakeLink</a> alternative to Chrome.
+	<div id="about">
+		<img src="icon128.png" class="icon" width="128" height="128" />
+		<div>
+			<h1>Create Link</h1>		
+	Firefox addon <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> alternative to Chrome.
+			<ul>
+				<li>developped by <a href="http://ido.nu/kuma/">ku</a></li>
+				<li>icons by <a href="http://icontoaster.com/?free-icons-for-all">icontoaster.com</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<h2>Formats</h2>
+	<div id="configuration">
+<table id="cocoatable" class="cocoatable"> 
+	<thead> 
+		<tr> 
+			<td id="column-name">Name</td> 
+			<td id="column-format">Format</td> 
+		</tr> 
+	</thead> 
+<tbody id="formats"> 
+</tbody> 
+</table> 
+<div class="plus-minus-buttons" id="button-container"> 
+	<div id="cocoatable-button-plus" class="button plus">+</div> 
+	<div id="cocoatable-button-minus" class="button minus">-</div> 
+	<div style="clear:both"><!-- --></div> 
+</div> 
+
+
+	</div>
 </body>
 </html>
