@@ -56,7 +56,8 @@ li.separator {
 				var data = def.format.
 					replace(/%url%/g, tab.url).
 					replace(/%text%/g, text).
-					replace(/%title%/g, text);
+					replace(/%title%/g, text).
+					replace(/%htmlEscapedText%/g, escapeHTML(text));
 
 				connection.postMessage({
 					command: 'setClipboard',
@@ -67,6 +68,13 @@ li.separator {
 
 		}
 	}
+
+	function escapeHTML(text) {
+		return text ? text.replace(/&|<|'|"/g, convertHTMLChar) : text;
+	}
+	function convertHTMLChar(c) { return charMap[c]; }
+	var charMap = {'&': '&amp;', '<': '&lt;', "'": '&apos;', '"': '&quot;'};
+
 	function setupEventHandlers() {
 		document.addEventListener( 'mouseup', function (ev) {
 			chrome.windows.getCurrent(function (w) {
