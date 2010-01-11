@@ -14,6 +14,13 @@
    },
    "name": "Create Link",
    "options_page": "options.html",
+   "content_scripts" : [{
+     "matches"    : ["http://*/*", "https://*/*"],
+     "css"        : [],
+     "js"         : ["content.js"],
+     "run_at"     : "document_end",
+     "all_frames" : true
+   }],
    "permissions": [ "tabs" ],
    "version": "0.0.6"
 }

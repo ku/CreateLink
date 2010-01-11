@@ -43,23 +43,28 @@ li.separator {
 
 		if ( id == 'configure' ) {
 			chrome.tabs.create({url:"options.html"});
+			window.close();
 		} else if ( id == 'separator' ) {
+			window.close();
 		} else if ( id.match(/^item(\d+)$/) ) {
-
 			var n = RegExp.$1;
 			var formats =  (chrome.self.getBackgroundPage().instance().formats);
-
 			var def = formats[n];
-			var data = def.format.
-				replace(/%url%/g, tab.url).
-				replace(/%text%/g, tab.title).
-				replace(/%title%/g, tab.title)
-				
-			
+
+			chrome.tabs.sendRequest(tab.id, "getSelection", function(response) {
+				var text = response.length > 0 ? response : tab.title;
+				var data = def.format.
+					replace(/%url%/g, tab.url).
+					replace(/%text%/g, text).
+					replace(/%title%/g, text);
+
 				connection.postMessage({
 					command: 'setClipboard',
 					data: data
 				} );
+				window.close();
+			});
+
 		}
 	}
 	function setupEventHandlers() {
@@ -67,7 +72,6 @@ li.separator {
 			chrome.windows.getCurrent(function (w) {
 				chrome.tabs.getSelected(w.id, function (t) {
 					onMenuSelected(t, ev.target.id);
-					window.close();
 				});
 			});
 		}, false);
