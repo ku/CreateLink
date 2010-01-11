@@ -31,7 +31,7 @@
 		} );
   }
   CreateLink.default_formats = [
-      {label: "Plain text", format: '%text% %url%' },
+      {label: "Plain text", format: '%text%%newline%%url%' },
       {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
   ];
   CreateLink.prototype.readFormats = function () {
@@ -59,6 +59,6 @@ function instance() {
 <!--
 <object id="clipboard_object" type="application/x-chrome-npapi-clipboard">Create Link Plugin failed to load</object>
 -->
-<input type="text" id="clipboard_object" />
+<textarea id="clipboard_object" />
 </body>
 </html>

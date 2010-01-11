@@ -57,6 +57,7 @@ li.separator {
 					replace(/%url%/g, tab.url).
 					replace(/%text%/g, text).
 					replace(/%title%/g, text).
+					replace(/%newline%/g, '\n').
 					replace(/%htmlEscapedText%/g, escapeHTML(text));
 
 				connection.postMessage({
