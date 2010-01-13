@@ -10,7 +10,6 @@
 	
   chrome.self.onConnect.addListener( function(port) {
 			port.onMessage.addListener( function(message, connection) {
-				console.log(message);
 				if ( message.command == 'setClipboard' ) {
 					var proxy = document.getElementById('clipboard_object');
 					if ( useNPAPI )
