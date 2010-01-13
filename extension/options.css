@@ -120,3 +120,12 @@ tbody td {
  #column-format {
  	width: 500px;
  }
+
+ #variables dt {
+ 	font-family: sans-serif;
+	color: rgb(128,0,0);
+ }
+ #variables dd {
+ 	margin-bottom: 0.5em;
+ }
+
