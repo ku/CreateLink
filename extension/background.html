@@ -7,22 +7,21 @@
 <script type="text/javascript" charset="utf-8">
 // <![CDATA[
 	var useNPAPI = false;
-	
-  chrome.self.onConnect.addListener( function(port) {
-			port.onMessage.addListener( function(message, connection) {
-				if ( message.command == 'setClipboard' ) {
-					var proxy = document.getElementById('clipboard_object');
-					if ( useNPAPI )
-						proxy.set(message.data);
-					else {
-						proxy.value = message.data;
-						proxy.select();
-						document.execCommand("copy");
-					}
-						
+
+	chrome.extension.onRequest.addListener(
+		function (request, sender, sendResponse) {
+			if ( request.command == 'setClipboard' ) {
+				var proxy = document.getElementById('clipboard_object');
+				if ( useNPAPI )
+					proxy.set(request.data);
+				else {
+					proxy.value = request.data;
+					proxy.select();
+					document.execCommand("copy");
 				}
-			} );
-	} );
+			}
+		}
+	);
   function CreateLink() {
 		var self = this;
 		this.__defineGetter__( "formats", function () {
