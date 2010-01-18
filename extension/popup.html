@@ -49,7 +49,7 @@ li.separator {
 			var formats =  (chrome.self.getBackgroundPage().instance().formats);
 			var def = formats[n];
 
-			chrome.tabs.sendRequest(tab.id, "getSelection", function(response) {
+			function sendRequestCallbackHandler(response) {
 				// see chrome://makelink/content/help/defininglinktypes.html
 				var text = response.length > 0 ? response : tab.title;
 				var data = def.format.
@@ -70,7 +70,15 @@ li.separator {
 					data: data
 				} );
 				window.close();
-			});
+			}
+			
+			// skip retrieving selection because content scripts disabled on chrome.google.com
+			// so that callback function for sendRequest does not be called.
+			if ( tab.url.match( /^https:\/\/chrome.google.com\// ) ) {
+				sendRequestCallbackHandler('');
+			} else {
+				chrome.tabs.sendRequest(tab.id, "getSelection", sendRequestCallbackHandler);
+			}
 		}
 	}
 

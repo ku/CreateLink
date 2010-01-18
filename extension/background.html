@@ -29,7 +29,7 @@
 		} );
   }
   CreateLink.default_formats = [
-      {label: "Plain text", format: '%text%%newline%%url%' },
+      {label: "Plain text", format: '%text% %url%' },
       {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
   ];
   CreateLink.prototype.readFormats = function () {
