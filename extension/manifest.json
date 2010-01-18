@@ -22,5 +22,5 @@
      "all_frames" : true
    }],
    "permissions": [ "tabs" ],
-   "version": "0.0.9"
+   "version": "0.0.10"
 }
