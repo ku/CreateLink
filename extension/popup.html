@@ -75,7 +75,6 @@ li.separator {
 	}
 
 	function escapeHTML(text) {
-					chrome.self.getBackgroundPage().console.log(text)
 		return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
 	}
 	function convertHTMLChar(c) { return charMap[c]; }
