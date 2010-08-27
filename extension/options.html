@@ -13,7 +13,7 @@
 		var formats = chrome.self.getBackgroundPage().instance().formats;
 		try{
 			var ctable	= new CocoaTable(formats, [
-				'label', 'format'
+				'label', 'format', 'filter'
 			] );
 			ctable._listener.onUpdated = function () {
 				var json = ctable.serialize();
@@ -47,6 +47,7 @@
 				<tr> 
 					<td id="column-name">Name</td> 
 					<td id="column-format">Format</td> 
+					<td id="column-filter">Filter</td> 
 				</tr> 
 			</thead> 
 		<tbody id="formats"> 

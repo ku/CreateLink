@@ -302,7 +302,7 @@ try	{
 
 			var cell = new CocoaTable.Cell( {
 				id: "cocoatable-cell-" + columnName + "-"+ suffixId,
-				text: def[columnName],
+				text: def[columnName] || '',
 				editing: editing,
 				listener: self
 			} );
