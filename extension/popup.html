@@ -52,18 +52,8 @@ li.separator {
 			chrome.tabs.sendRequest(tab.id, "getSelection", function(response) {
 				// see chrome://makelink/content/help/defininglinktypes.html
 				var text = response.length > 0 ? response : tab.title;
-				var data = def.format.
-					replace(/%url%/g, tab.url).
-					replace(/%text%/g, text.replace(/\n/g, ' ')).
-					replace(/%text_n%/g, text).
-					replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
-					replace(/%title%/g, tab.title).
-					replace(/%newline%/g, '\n').
-					replace(/%htmlEscapedText%/g, escapeHTML(text)).
-					// TODO: window.prompt does not respond in popup window.
-					//replace(/%input%/g, showPrompt).
-					replace(/\\t/g, '\t').
-					replace(/\\n/g, '\n');
+				var data = chrome.self.getBackgroundPage().instance().formatLinkText(
+          n, tab.url, text, tab.title);
 
 				chrome.extension.sendRequest({
 					command: 'setClipboard',
@@ -72,24 +62,6 @@ li.separator {
 				window.close();
 			});
 		}
-	}
-
-	function escapeHTML(text) {
-		return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
-	}
-	function convertHTMLChar(c) { return charMap[c]; }
-	var charMap = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		"'": '&apos;',
-		'"': '&quot;'
-	};
-	
-	function showPrompt(text, pos, subject) {
-		var msg = "Please enter the input text for \n" + subject;
-		var s = window.prompt(msg);
-		return (s === null) ? "" : s;
 	}
 
 	function setupEventHandlers() {

@@ -21,6 +21,6 @@
      "run_at"     : "document_end",
      "all_frames" : true
    }],
-   "permissions": [ "tabs" ],
-   "version": "0.0.7"
+   "permissions": [ "tabs", "contextMenus" ],
+   "version": "0.0.13"
 }

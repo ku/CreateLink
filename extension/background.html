@@ -8,17 +8,21 @@
 // <![CDATA[
 	var useNPAPI = false;
 
+  function copyToClipboard(text) {
+    var proxy = document.getElementById('clipboard_object');
+    if ( useNPAPI )
+      proxy.set(text);
+    else {
+      proxy.value = text;
+      proxy.select();
+      document.execCommand("copy");
+    }
+  }
+
 	chrome.extension.onRequest.addListener(
 		function (request, sender, sendResponse) {
 			if ( request.command == 'setClipboard' ) {
-				var proxy = document.getElementById('clipboard_object');
-				if ( useNPAPI )
-					proxy.set(request.data);
-				else {
-					proxy.value = request.data;
-					proxy.select();
-					document.execCommand("copy");
-				}
+        copyToClipboard(request.data);
 			}
 		}
 	);
@@ -43,12 +47,65 @@
     }
 		return formats;
   }
+	function escapeHTML(text) {
+		return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
+	}
+	function convertHTMLChar(c) { return charMap[c]; }
+	var charMap = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		"'": '&apos;',
+		'"': '&quot;'
+	};
+	function showPrompt(text, pos, subject) {
+		var msg = "Please enter the input text for \n" + subject;
+		var s = window.prompt(msg);
+		return (s === null) ? "" : s;
+	}
+  CreateLink.prototype.formatLinkText = function (formatId, url, text, title) {
+    return this.formats[formatId].format.
+					replace(/%url%/g, url).
+					replace(/%text%/g, text.replace(/\n/g, ' ')).
+					replace(/%text_n%/g, text).
+					replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
+					replace(/%title%/g, title).
+					replace(/%newline%/g, '\n').
+					replace(/%htmlEscapedText%/g, escapeHTML(text)).
+					// TODO: window.prompt does not respond in popup window.
+					//replace(/%input%/g, showPrompt).
+					replace(/\\t/g, '\t').
+					replace(/\\n/g, '\n');
+  }
   
 function instance() {
 	if ( !window.__instance ) {
 		window.__instance = new CreateLink();
 	}
 	return window.__instance;
+}
+
+function onMenuItemClick(info, tab) {
+  /*alert("info: " + JSON.stringify(info) + "\n" +
+        "tab: " + JSON.stringify(tab));*/
+  var formatId = parseInt(info.menuItemId) - 1;
+  var url = info.linkUrl ? info.linkUrl : info.pageUrl;
+  var text = info.selectionText ? info.selectionText : tab.title;
+  var title = tab.title;
+  var linkText = instance().formatLinkText(formatId, url, text, title);
+  copyToClipboard(linkText);
+}
+var formats =  instance().formats;
+if (formats.length == 1) {
+  chrome.contextMenus.create({"title": "Copy Link as " + formats[0].label,
+                              "contexts": ["all"],
+                              "onclick": onMenuItemClick});
+} else {
+  for (var i = 0; i < formats.length; ++i) {
+    chrome.contextMenus.create({"title": formats[i].label,
+                                "contexts": ["all"],
+                                "onclick": onMenuItemClick});
+  }
 }
 
 // ]]>
