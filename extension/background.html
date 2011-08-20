@@ -33,8 +33,9 @@
 		} );
   }
   CreateLink.default_formats = [
-      {label: "Plain text", format: '%text%%newline%%url%' },
+      {label: "Plain text", format: '%text% %url%' },
       {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
+      {label: "mediaWiki", format: '[%url% %text%]' },
   ];
   CreateLink.prototype.readFormats = function () {
 		var formats;
@@ -64,18 +65,29 @@
 		return (s === null) ? "" : s;
 	}
   CreateLink.prototype.formatLinkText = function (formatId, url, text, title) {
-    return this.formats[formatId].format.
-					replace(/%url%/g, url).
-					replace(/%text%/g, text.replace(/\n/g, ' ')).
-					replace(/%text_n%/g, text).
-					replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
-					replace(/%title%/g, title).
-					replace(/%newline%/g, '\n').
-					replace(/%htmlEscapedText%/g, escapeHTML(text)).
-					// TODO: window.prompt does not respond in popup window.
-					//replace(/%input%/g, showPrompt).
-					replace(/\\t/g, '\t').
-					replace(/\\n/g, '\n');
+    var def = this.formats[formatId];
+    var data = def.format.
+      replace(/%url%/g, url).
+      replace(/%text%/g, text.replace(/\n/g, ' ')).
+      replace(/%text_n%/g, text).
+      replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
+      replace(/%title%/g, title).
+      replace(/%newline%/g, '\n').
+      replace(/%htmlEscapedText%/g, escapeHTML(text)).
+      // TODO: window.prompt does not respond in popup window.
+      //replace(/%input%/g, showPrompt).
+      replace(/\\t/g, '\t').
+      replace(/\\n/g, '\n');
+    chrome.self.getBackgroundPage().console.log("def.filter")
+    chrome.self.getBackgroundPage().console.log(def.filter)
+    if (def.filter) {
+      var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
+      chrome.self.getBackgroundPage().console.log(m)
+      if (m) {
+        data = data.replace(m[1], m[2]);
+      }
+    }
+    return data;    
   }
   
 function instance() {
