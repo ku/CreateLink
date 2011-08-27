@@ -1,3 +1,11 @@
+body {
+  padding-bottom: 2em;
+}
+
+#about {
+  display: -webkit-box;
+}
+
 thead td {
 padding: 4px;
 				 padding-left: 20px;
@@ -76,10 +84,16 @@ table.cocoatable input {
  
 ul  {
 	list-style-type: none;
+  margin-left: 0;
+  padding-left: 0;
 }
 img.icon {
 	display: block;
 	float: left;
+}
+
+ul.contributors li {
+  margin-left: 2em;
 }
 
 h1 {
