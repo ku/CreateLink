@@ -100,13 +100,14 @@ function instance() {
 function onMenuItemClick(info, tab) {
 	/*alert("info: " + JSON.stringify(info) + "\n" +
 				"tab: " + JSON.stringify(tab));*/
-	var formatId = parseInt(info.menuItemId) - 1;
+	var formatId = contextMenuIdList[info.menuItemId];
 	var url = info.linkUrl ? info.linkUrl : info.pageUrl;
 	var text = info.selectionText ? info.selectionText : tab.title;
 	var title = tab.title;
 	var linkText = instance().formatLinkText(formatId, url, text, title);
 	copyToClipboard(linkText);
 }
+var contextMenuIdList = {}
 var formats =	instance().formats;
 if (formats.length == 1) {
 	chrome.contextMenus.create({"title": "Copy Link as " + formats[0].label,
@@ -114,9 +115,10 @@ if (formats.length == 1) {
 								"onclick": onMenuItemClick});
 } else {
 	for (var i = 0; i < formats.length; ++i) {
-		chrome.contextMenus.create({"title": formats[i].label,
+		var menuId = chrome.contextMenus.create({"title": formats[i].label,
 									"contexts": ["all"],
 									"onclick": onMenuItemClick});
+		contextMenuIdList[menuId] = i;
 	}
 }
 

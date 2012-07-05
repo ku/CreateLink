@@ -2,12 +2,11 @@
 NAME=createlink
 EXTDIR=extension
 
-$(NAME).crx:
-	crxmake --pack-extension=$(EXTDIR) --extension-output=$(NAME).crx \
-		--key-output=/dev/null
+CRXMAKE_DIR=./crxmake
+SRC=extension/*.*
 
-zip:
-	zip -jr $(NAME).zip $(EXTDIR)
+$(NAME).zip: $(SRC)
+	zip -jr $@ $(SRC)
 
 clean:
 	rm $(NAME).crx $(NAME).zip
