@@ -50,13 +50,13 @@ li.separator {
 			var formats =  (chrome.extension.getBackgroundPage().instance().formats);
 			var def = formats[n];
 
-			function sendRequestCallbackHandler(response) {
+			function sendMessageCallbackHandler(response) {
 				// see chrome://makelink/content/help/defininglinktypes.html
 				var text = response.length > 0 ? response : tab.title;
 				var data = chrome.extension.getBackgroundPage().instance().formatLinkText(
 					n, tab.url, text, tab.title);
 
-				chrome.extension.sendRequest({
+				chrome.extension.sendMessage({
 					command: 'setClipboard',
 					data: data
 				} );
@@ -64,11 +64,11 @@ li.separator {
 			}
 			
 			// skip retrieving selection because content scripts disabled on chrome.google.com
-			// so that callback function for sendRequest does not be called.
+			// so that callback function for sendMessage does not be called.
 			if ( tab.url.match( /^https:\/\/chrome.google.com\// ) ) {
-				sendRequestCallbackHandler('');
+				sendMessageCallbackHandler('');
 			} else {
-				chrome.tabs.sendRequest(tab.id, "getSelection", sendRequestCallbackHandler);
+				chrome.tabs.sendMessage(tab.id, "getSelection", sendMessageCallbackHandler);
 			}
 		}
 	}

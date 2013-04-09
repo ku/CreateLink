@@ -19,7 +19,7 @@
 		}
 	}
 
-	chrome.extension.onRequest.addListener(
+	chrome.extension.onMessage.addListener(
 		function (request, sender, sendResponse) {
 			if ( request.command == 'setClipboard' ) {
 				copyToClipboard(request.data);
