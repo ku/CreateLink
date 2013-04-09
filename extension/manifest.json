@@ -21,10 +21,16 @@
    "content_scripts" : [{
      "matches"    : ["http://*/*", "https://*/*"],
      "css"        : [],
-     "js"         : ["content.js"],
+     "js"         : [
+       "background.js",
+       "cocoatable.js",
+       "content.js",
+       "options.js",
+       "popup.js"
+     ],
      "run_at"     : "document_end",
      "all_frames" : true
    }],
    "permissions": [ "tabs", "contextMenus" ],
-   "version": "0.1.1"
+   "version": "0.1.3"
 }
