@@ -47,13 +47,13 @@ li.separator {
 			window.close();
 		} else if ( id.match(/^item(\d+)$/) ) {
 			var n = RegExp.$1;
-			var formats =  (chrome.self.getBackgroundPage().instance().formats);
+			var formats =  (chrome.extension.getBackgroundPage().instance().formats);
 			var def = formats[n];
 
 			function sendRequestCallbackHandler(response) {
 				// see chrome://makelink/content/help/defininglinktypes.html
 				var text = response.length > 0 ? response : tab.title;
-				var data = chrome.self.getBackgroundPage().instance().formatLinkText(
+				var data = chrome.extension.getBackgroundPage().instance().formatLinkText(
 					n, tab.url, text, tab.title);
 
 				chrome.extension.sendRequest({
@@ -106,10 +106,10 @@ li.separator {
 	window.addEventListener( "load", function () {
 		try{
 			setupEventHandlers();
-			setupListItems(chrome.self.getBackgroundPage().instance().formats);
+			setupListItems(chrome.extension.getBackgroundPage().instance().formats);
 		}catch(e){
-					chrome.self.getBackgroundPage().console.log(e)
-					chrome.self.getBackgroundPage().console.log(e.line)
+					chrome.extension.getBackgroundPage().console.log(e)
+					chrome.extension.getBackgroundPage().console.log(e.line)
 		}
 	}, false);
 	

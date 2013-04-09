@@ -78,11 +78,11 @@
 			//replace(/%input%/g, showPrompt).
 			replace(/\\t/g, '\t').
 			replace(/\\n/g, '\n');
-		chrome.self.getBackgroundPage().console.log("def.filter")
-		chrome.self.getBackgroundPage().console.log(def.filter)
+		chrome.extension.getBackgroundPage().console.log("def.filter")
+		chrome.extension.getBackgroundPage().console.log(def.filter)
 		if (def.filter) {
 			var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
-			chrome.self.getBackgroundPage().console.log(m)
+			chrome.extension.getBackgroundPage().console.log(m)
 			if (m) {
 				data = data.replace(m[1], m[2]);
 			}

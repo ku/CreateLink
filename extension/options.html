@@ -10,7 +10,7 @@
  
 	window.addEventListener( 'load', function () {
 		var localStorageKey = 'format_preferences';
-		var formats = chrome.self.getBackgroundPage().instance().formats;
+		var formats = chrome.extension.getBackgroundPage().instance().formats;
 		try{
 			var ctable	= new CocoaTable(formats, [
 				'label', 'format', 'filter'
