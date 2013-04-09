@@ -1,9 +1,13 @@
 {
-   "background_page": "background.html",
+   "manifest_version": 2,
+   "background": {
+     "page": "background.html",
+     "persistent": false
+   },
    "browser_action": {
       "default_icon": "icon64.png",
       "default_title": "Create Link",
-      "popup": "popup.html"
+      "default_popup": "popup.html"
    },
    "description": "Copy current page URL to clipboard in various formats.",
    "icons": {
