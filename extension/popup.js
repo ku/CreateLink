@@ -1,3 +1,5 @@
+var _createLink = null;
+
 function onMenuSelected(tab, id) {
   if ( id == 'configure' ) {
     chrome.tabs.create({url:"options.html"});
@@ -6,13 +8,12 @@ function onMenuSelected(tab, id) {
     window.close();
   } else if ( id.match(/^item(\d+)$/) ) {
     var n = RegExp.$1;
-    var formats =  (chrome.extension.getBackgroundPage().instance().formats);
+    var formats =  (_createLink.formats);
     var def = formats[n];
 
     function sendMessageCallbackHandler(response) {
-      // see chrome://makelink/content/help/defininglinktypes.html
-      var text = response.length > 0 ? response : tab.title;
-      var data = chrome.extension.getBackgroundPage().instance().formatLinkText(
+      var text = (response && response.length > 0) ? response : tab.title;
+      var data = _createLink.formatLinkText(
         n, tab.url, text, tab.title);
 
       chrome.extension.sendMessage({
@@ -63,15 +64,18 @@ function setupListItems(formats) {
 }
 
 window.addEventListener( "load", function () {
-  try{
+  try {
     setupEventHandlers();
-console.log("backgroundpage!!!");
-console.log(chrome.extension.getBackgroundPage());
-console.log("backgroundpage instance!!!");
-console.log(chrome.extension.getBackgroundPage().instance());
-    setupListItems(chrome.extension.getBackgroundPage().instance().formats);
+
+    chrome.runtime.getBackgroundPage(function (backgroundWindow) {
+      _createLink = backgroundWindow.instance();
+
+      var formats = _createLink.formats;
+      setupListItems(formats);
+    });
   }catch(e){
-        chrome.extension.getBackgroundPage().console.log(e)
-        chrome.extension.getBackgroundPage().console.log(e.line)
+    chrome.runtime.getBackgroundPage(function (backgroundWindow) {
+      backgroundWindow.console.log(e, e.line)
+    });
   }
 }, false);

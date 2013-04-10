@@ -70,11 +70,8 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title) {
     //replace(/%input%/g, showPrompt).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
-  chrome.extension.getBackgroundPage().console.log("def.filter")
-  chrome.extension.getBackgroundPage().console.log(def.filter)
   if (def.filter) {
     var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
-    chrome.extension.getBackgroundPage().console.log(m)
     if (m) {
       data = data.replace(m[1], m[2]);
     }
@@ -89,9 +86,7 @@ function instance() {
 	return window.__instance;
 }
 
-function onMenuItemClick(info, tab) {
-	/*alert("info: " + JSON.stringify(info) + "\n" +
-				"tab: " + JSON.stringify(tab));*/
+function onMenuItemClick(contextMenuIdList, info, tab) {
 	var formatId = contextMenuIdList[info.menuItemId];
 	var url = info.linkUrl ? info.linkUrl : info.pageUrl;
 	var text = info.selectionText ? info.selectionText : tab.title;
@@ -99,17 +94,31 @@ function onMenuItemClick(info, tab) {
 	var linkText = instance().formatLinkText(formatId, url, text, title);
 	copyToClipboard(linkText);
 }
-var contextMenuIdList = {}
-var formats =	instance().formats;
-if (formats.length == 1) {
-	chrome.contextMenus.create({"title": "Copy Link as " + formats[0].label,
-								"contexts": ["all"],
-								"onclick": onMenuItemClick});
-} else {
-	for (var i = 0; i < formats.length; ++i) {
-		var menuId = chrome.contextMenus.create({"title": formats[i].label,
-									"contexts": ["all"],
-									"onclick": onMenuItemClick});
-		contextMenuIdList[menuId] = i;
-	}
-}
+
+window.addEventListener('load', function () {
+  var contextMenuIdList = {};
+
+  var formats =	instance().formats;
+  if (formats.length == 1) {
+    chrome.contextMenus.create({
+      "title": "Copy Link as " + formats[0].label,
+      "id": "context-menu-item-0",
+      "contexts": ["all"],
+    });
+  } else {
+    for (var i = 0; i < formats.length; ++i) {
+      var menuId = chrome.contextMenus.create({
+        "title": formats[i].label,
+        "id": "context-menu-item-" + i,
+        "contexts": ["all"],
+      });
+      contextMenuIdList[menuId] = i;
+    }
+  }
+
+  chrome.contextMenus.onClicked.addListener(function (info, tab) {
+    var n = Number(info.menuItemId.split(/-/).pop());
+    onMenuItemClick(contextMenuIdList, info, tab);
+  })
+
+}, false);
