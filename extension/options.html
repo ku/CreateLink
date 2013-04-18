@@ -5,27 +5,7 @@
 <title>Options - Create Link</title>
     <link rel="stylesheet" type="text/css" href="./options.css" media="all" />
         	<script type="text/javascript" charset="utf-8" src="cocoatable.js"></script>
-	<script type="text/javascript" charset="utf-8"> 
-	// <![CDATA[
- 
-	window.addEventListener( 'load', function () {
-		var localStorageKey = 'format_preferences';
-		var formats = chrome.self.getBackgroundPage().instance().formats;
-		try{
-			var ctable	= new CocoaTable(formats, [
-				'label', 'format', 'filter'
-			] );
-			ctable._listener.onUpdated = function () {
-				var json = ctable.serialize();
-				localStorage[localStorageKey] = json;
-			}
-			window.ctable = ctable;
-			}catch(e){
-				console.log(e)
-			}
-	}, false);
-// ]]>
-</script> 
+	<script src="options.js"></script>
 </head>
 <body>
 	<div id="about">
@@ -33,7 +13,9 @@
 		<img src="icon128.png" class="icon" width="128" height="128" />
     </div>
 		<div>
-			<h1>Create Link</h1>		
+      <div style="display: -webkit-box">
+        <h1>Create Link</h1><h2 id="version"></h2>
+      </div>
 			Firefox addon <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> alternative to Chrome.
 			<ul>
 				<li>Developped by <a href="http://ido.nu/kuma/">ku</a></li>
