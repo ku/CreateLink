@@ -20,6 +20,25 @@ window.addEventListener( 'load', function () {
     }catch(e){
       console.log(e)
     }
+
+    var formats_json_textarea = document.getElementById("formats_json");
+    var export_button = document.getElementById("export");
+    var import_button = document.getElementById("import");
+
+    export_button.addEventListener( 'click', function () {
+      formats_json_textarea.value = localStorage[localStorageKey];
+    }, false);
+
+    import_button.addEventListener( 'click', function () {
+      localStorage[localStorageKey] = formats_json_textarea.value;
+      chrome.tabs.reload();
+    }, false);
+
+    formats_json_textarea.addEventListener( 'click', function () {
+      this.focus();
+      this.select();
+    }, false);
+
   });
   
 }, false);
