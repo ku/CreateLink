@@ -98,6 +98,8 @@ function onMenuItemClick(contextMenuIdList, info, tab) {
 window.addEventListener('load', function () {
   var contextMenuIdList = {};
 
+  chrome.contextMenus.removeAll();
+
   var formats =	instance().formats;
   if (formats.length == 1) {
     chrome.contextMenus.create({
