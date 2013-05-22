@@ -15,6 +15,8 @@ chrome.extension.onMessage.addListener(
   function (request, sender, sendResponse) {
     if ( request.command == 'setClipboard' ) {
       copyToClipboard(request.data);
+    } else if ( request.command == 'updateContextMenus' ) {
+      updateContextMenus();
     }
   }
 );
@@ -95,7 +97,7 @@ function onMenuItemClick(contextMenuIdList, info, tab) {
 	copyToClipboard(linkText);
 }
 
-window.addEventListener('load', function () {
+function updateContextMenus() {
   var contextMenuIdList = {};
 
   chrome.contextMenus.removeAll();
@@ -122,5 +124,8 @@ window.addEventListener('load', function () {
     var n = Number(info.menuItemId.split(/-/).pop());
     onMenuItemClick(contextMenuIdList, info, tab);
   })
+}
 
+window.addEventListener('load', function () {
+  updateContextMenus();
 }, false);
