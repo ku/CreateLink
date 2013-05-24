@@ -15,6 +15,11 @@ window.addEventListener( 'load', function () {
       ctable._listener.onUpdated = function () {
         var json = ctable.serialize();
         localStorage[localStorageKey] = json;
+
+        // Update context menus
+        chrome.extension.sendMessage({
+          command: 'updateContextMenus',
+        });
       }
       window.ctable = ctable;
     }catch(e){
