@@ -1,14 +1,9 @@
-var useNPAPI = false;
 
 function copyToClipboard(text) {
   var proxy = document.getElementById('clipboard_object');
-  if ( useNPAPI )
-    proxy.set(text);
-  else {
-    proxy.value = text;
-    proxy.select();
-    document.execCommand("copy");
-  }
+  proxy.value = text;
+  proxy.select();
+  document.execCommand("copy");
 }
 
 chrome.extension.onMessage.addListener(
@@ -29,6 +24,7 @@ function CreateLink() {
 CreateLink.default_formats = [
     {label: "Plain text", format: '%text% %url%' },
     {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
+    {label: "markdown", format: '[%text%](%url%)' },
     {label: "mediaWiki", format: '[%url% %text%]' },
 ];
 CreateLink.prototype.readFormats = function () {
@@ -128,4 +124,13 @@ function updateContextMenus() {
 
 window.addEventListener('load', function () {
   updateContextMenus();
+  
+  document.addEventListener('copy', function (ev) {
+    ev.preventDefault();
+
+    var proxy = document.getElementById('clipboard_object');
+    var text = proxy.value;
+    ev.clipboardData.setData("text/plain", text);
+    ev.clipboardData.setData("text/html", text);
+  }, true);
 }, false);
