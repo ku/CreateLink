@@ -54,8 +54,22 @@ function showPrompt(text, pos, subject) {
   var s = window.prompt(msg);
   return (s === null) ? "" : s;
 }
-CreateLink.prototype.formatLinkText = function (formatId, url, text, title) {
-  var def = this.formats[formatId];
+
+function sendMessageToTab(tabId, message) {
+  return _.Deferred(function (d) {
+    chrome.tabs.sendMessage(tabId, message, function (res) {
+      d.resolve(res);
+    });
+  });
+}
+
+CreateLink.prototype.format = function (formatId) {
+  return this.formats[formatId];
+}
+CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabId) {
+  var d;
+
+  var def = this.format(formatId);
   var data = def.format.
     replace(/%url%/g, url).
     replace(/%text%/g, text.replace(/\n/g, ' ')).
@@ -64,19 +78,39 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title) {
     replace(/%title%/g, title).
     replace(/%newline%/g, '\n').
     replace(/%htmlEscapedText%/g, escapeHTML(text)).
-    // TODO: window.prompt does not respond in popup window.
-    //replace(/%input%/g, showPrompt).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
-  if (def.filter) {
-    var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
-    if (m) {
-      data = data.replace(m[1], m[2]);
-    }
+  
+  var m = data.match(/%input%/g);
+  if (m) {
+    var inputDeferreds = m.map(function () {
+      return sendMessageToTab(tabId, 'showInputDialog');
+    });
+    d = _.when.apply(_, inputDeferreds).pipe(function () {
+      var inputs = _.toArray(arguments);
+      var index = 0;
+      data = data.replace(/%input%/g, function (s) {
+        return inputs[index++];
+      });
+      return data;
+    });
+  } else {
+    d = _.Deferred().resolve(data);
   }
-  return data;
+
+  d.pipe(function (data) {
+    if (def.filter) {
+      var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
+      if (m) {
+        data = data.replace(m[1], m[2]);
+      }
+    }
+    return data;
+  });
+
+  return d;
 }
-	
+
 function instance() {
 	if ( !window.__instance ) {
 		window.__instance = new CreateLink();
@@ -85,12 +119,19 @@ function instance() {
 }
 
 function onMenuItemClick(contextMenuIdList, info, tab) {
-	var formatId = contextMenuIdList[info.menuItemId];
-	var url = info.linkUrl ? info.linkUrl : info.pageUrl;
-	var text = info.selectionText ? info.selectionText : tab.title;
-	var title = tab.title;
-	var linkText = instance().formatLinkText(formatId, url, text, title);
-	copyToClipboard(linkText);
+  var url;
+  if (info.mediaType === 'image') {
+    url = info.srcUrl;
+  } else {
+    url = info.linkUrl ||  info.pageUrl;
+  }
+  var text = info.selectionText || tab.title;
+  var title = tab.title;
+
+  var formatId = contextMenuIdList[info.menuItemId];
+  instance().formatLinkText(formatId, url, text, title, tab.id).pipe(function (linkText) {
+    copyToClipboard(linkText);
+  });
 }
 
 function updateContextMenus() {
@@ -98,7 +139,7 @@ function updateContextMenus() {
 
   chrome.contextMenus.removeAll();
 
-  var formats =	instance().formats;
+  var formats = instance().formats;
   if (formats.length == 1) {
     chrome.contextMenus.create({
       "title": "Copy Link as " + formats[0].label,

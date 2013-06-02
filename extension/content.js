@@ -1,4 +1,6 @@
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-    var sel = window.getSelection();
-    sendResponse(sel ? sel.toString() : '');
+  if (request === 'showInputDialog') {
+    var text = window.prompt("CreateLink needs your input");
+    return sendResponse(text);
+  }
 });
