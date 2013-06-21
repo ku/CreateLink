@@ -4,6 +4,11 @@
      "page": "background.html",
      "persistent": false
    },
+   "browser_action": {
+      "default_icon": "icon64.png",
+      "default_title": "Create Link",
+      "default_popup": "popup.html"
+   },
    "description": "Copy current page URL to clipboard in various formats.",
    "icons": {
       "128": "icon128.png",
@@ -22,6 +27,6 @@
      "run_at"     : "document_end",
      "all_frames" : true
    }],
-   "permissions": [ "tabs", "contextMenus" ],
-   "version": "0.2.6"
+   "permissions": [ "tabs", "http://*/*", "contextMenus" ],
+   "version": "0.2.7"
 }

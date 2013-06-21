@@ -1,11 +1,4 @@
 
-function copyToClipboard(text) {
-  var proxy = document.getElementById('clipboard_object');
-  proxy.value = text;
-  proxy.select();
-  document.execCommand("copy");
-}
-
 chrome.extension.onMessage.addListener(
   function (request, sender, sendResponse) {
     if ( request.command == 'setClipboard' ) {
@@ -27,6 +20,14 @@ CreateLink.default_formats = [
     {label: "markdown", format: '[%text%](%url%)' },
     {label: "mediaWiki", format: '[%url% %text%]' },
 ];
+
+CreateLink.prototype.copyToClipboard = function (text) {
+  var proxy = document.getElementById('clipboard_object');
+  proxy.value = text;
+  proxy.select();
+  document.execCommand("copy");
+}
+
 CreateLink.prototype.readFormats = function () {
   var formats;
   try {
@@ -130,7 +131,7 @@ function onMenuItemClick(contextMenuIdList, info, tab) {
 
   var formatId = contextMenuIdList[info.menuItemId];
   instance().formatLinkText(formatId, url, text, title, tab.id).pipe(function (linkText) {
-    copyToClipboard(linkText);
+    instance().copyToClipboard(linkText);
   });
 }
 
