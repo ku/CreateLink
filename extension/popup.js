@@ -1,26 +1,5 @@
 var _createLink = null;
 
-/*
-chrome.windows.getAll(function (w) {
-  console.log(w.map(function (w) {return w.id
-      }))
-});
-
-  chrome.windows.get(218, {populate:true},function (w) {
-    var tabId = w.tabs.filter(function (tab) {
-      return tab.selected
-  }).shift().id;
-  window.t = w; 
-  console.log(tabId )
-
-  chrome.tabs.executeScript(tabId, {
-    code: "alert(document.getSelection().toString())"
-  }, function (r) {
-    console.log(r)
-  })
-})
-*/
-
 function onMenuSelected(tab, id) {
   if ( id == 'configure' ) {
     chrome.tabs.create({url:"options.html"});
@@ -46,7 +25,7 @@ function onMenuSelected(tab, id) {
 
           var url = tab.url;
           var title = tab.title;
-          var text = (selectedText == '') ? title : selectedText;
+          var text = (selectedText && selectedText != '') ? selectedText : title;
 
           _createLink.formatLinkText(n, url, text, title, tabId).pipe(function (linkText) {
             _createLink.copyToClipboard(linkText);

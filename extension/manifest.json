@@ -27,6 +27,6 @@
      "run_at"     : "document_end",
      "all_frames" : true
    }],
-   "permissions": [ "tabs", "http://*/*", "contextMenus" ],
-   "version": "0.2.8"
+   "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ],
+   "version": "0.2.9"
 }

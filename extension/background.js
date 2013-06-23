@@ -68,9 +68,6 @@ CreateLink.prototype.format = function (formatId) {
   return this.formats[formatId];
 }
 CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabId) {
-  title = title || '';
-  text = text || title;
-
   var d;
 
   var def = this.format(formatId);
