@@ -19,7 +19,7 @@
    "name": "Create Link",
    "options_page": "options.html",
    "content_scripts" : [{
-     "matches"    : ["http://*/*", "https://*/*"],
+     "matches"    : ["http://*/*", "https://*/*", "file:///*/*"],
      "css"        : [],
      "js"         : [
        "content.js"
