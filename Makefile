@@ -1,7 +1,7 @@
 
 NAME=createlink
 EXTDIR=extension
-VERSION=$(shell plutil -convert json -r -o  -  ./extension/manifest.json | "grep" '"version"' | "egrep" -o '\w(\.\w)+')
+VERSION=$(shell plutil -convert json -r -o  -  ./extension/manifest.json | "grep" '"version"' | "egrep" -o '\w(\.\w+)+')
 DIRNAME=$(shell pwd)
 SRC=extension
 
