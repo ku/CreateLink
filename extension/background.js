@@ -81,7 +81,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     replace(/%htmlEscapedText%/g, escapeHTML(text)).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
-  
+
   var m = data.match(/%input%/g);
   if (m) {
     var inputDeferreds = m.map(function () {
@@ -99,7 +99,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     d = _.Deferred().resolve(data);
   }
 
-  d.pipe(function (data) {
+  d = d.pipe(function (data) {
     if (def.filter) {
       var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
       if (m) {
@@ -166,7 +166,7 @@ function updateContextMenus() {
 
 window.addEventListener('load', function () {
   updateContextMenus();
-  
+
   document.addEventListener('copy', function (ev) {
     ev.preventDefault();
 
