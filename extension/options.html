@@ -69,5 +69,13 @@
 		<dt>%input%</dt>
 		<dd>Popups a dialog to input text.</dd>
 	</dl>
+
+	<h2>Filter</h2>
+	<div>
+	<p>Filter must be specified in the following format (perl-like substitution operator): <code>s/<i>&lt;pattern&gt;</i>/<i>&lt;replacement&gt;</i>/<i>[&lt;flags&gt;]</i></code><br>
+	Pattern is  regular expression and flags are either "g", "i", "m" or "y".</p>
+	<p>For example, <code>s/\[at\]/@/gi</code> will replace all occurrences (g) of "[at]/[AT]/[At]/[aT]" case-insensitively (i) into "@".</p>
+	</div>
+
 </body>
 </html>
