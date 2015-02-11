@@ -17,7 +17,7 @@ function CreateLink() {
 CreateLink.default_formats = [
     {label: "Plain text", format: '%text% %url%' },
     {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
-    {label: "markdown", format: '[%text_vb%](%url%)' },
+    {label: "markdown", format: '[%text_md%](%url%)' },
     {label: "mediaWiki", format: '[%url% %text%]' },
 ];
 
@@ -76,7 +76,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     replace(/%text%/g, text.replace(/\n/g, ' ')).
     replace(/%text_n%/g, text).
     replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
-    replace(/%text_vb%/g, text.replace(/\|/g, '\\\|')).
+    replace(/%text_md%/g, text.replace(/[|\\`*_{}\[\]()#+\-.!]/g, '\\$&')).
     replace(/%title%/g, title).
     replace(/%newline%/g, '\n').
     replace(/%htmlEscapedText%/g, escapeHTML(text)).

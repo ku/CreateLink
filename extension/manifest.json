@@ -28,5 +28,5 @@
      "all_frames" : true
    }],
    "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ],
-   "version": "0.2.10"
+   "version": "0.2.11"
 }
