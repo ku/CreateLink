@@ -73,6 +73,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
   var def = this.format(formatId);
   var data = def.format.
     replace(/%url%/g, url).
+    replace(/%decoded_url%/g, decodeURIComponent(url)).
     replace(/%text%/g, text.replace(/\n/g, ' ')).
     replace(/%text_n%/g, text).
     replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
