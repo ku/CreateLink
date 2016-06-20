@@ -28,17 +28,37 @@ CreateLink.prototype.copyToClipboard = function (text) {
   document.execCommand("copy");
 }
 
+var formatPreferencesKey = 'format_preferences';
+var defaultFormatKey = 'defaultFormat';
+
+CreateLink.prototype.setDefaultFormat = function (value) {
+  localStorage[defaultFormatKey] = value;
+};
+
+CreateLink.prototype.getDefaultFormat = function () {
+  return localStorage[defaultFormatKey];
+};
+
+CreateLink.prototype.setFormatPreferences = function (formatsString) {
+  localStorage[formatPreferencesKey] = formatsString;
+};
+
+CreateLink.prototype.getFormatPreferences = function () {
+  return JSON.parse(localStorage[formatPreferencesKey] || '[]');
+};
+
 CreateLink.prototype.readFormats = function () {
   var formats;
   try {
-    formats = JSON.parse( localStorage.format_preferences );
+    formats = this.getFormatPreferences();
   } catch(e) {
   }
-  if ( !formats ) {
+  if ( !formats || formats.length == 0 ) {
     formats = CreateLink.default_formats;
   }
   return formats;
-}
+};
+
 function escapeHTML(text) {
   return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
 }
@@ -82,7 +102,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     replace(/%htmlEscapedText%/g, escapeHTML(text)).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
-  
+
   var m = data.match(/%input%/g);
   if (m) {
     var inputDeferreds = m.map(function () {
@@ -167,7 +187,7 @@ function updateContextMenus() {
 
 window.addEventListener('load', function () {
   updateContextMenus();
-  
+
   document.addEventListener('copy', function (ev) {
     ev.preventDefault();
 
