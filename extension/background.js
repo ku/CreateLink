@@ -249,9 +249,16 @@ function onKeyboardShortcut(command) {
         var target = instance();
         var label = target.getDefaultFormat();
         var formatId = target.indexOfFormatByLabel(label);
-        var info = {};
-        onMenuItemClick(formatId, info, tab);
-        flashBadge('success', label);
+        if (formatId >= 0) {
+          var info = {};
+          onMenuItemClick(formatId, info, tab);
+          flashBadge('success', label);
+        } else {
+          // User has never set the default or else the previously-defaulted
+          //  format was probably removed, so let user know,
+          //  but don't automatically reset the default for her/him
+          flashBadge('fail');
+        }
       });
       break;
   }
