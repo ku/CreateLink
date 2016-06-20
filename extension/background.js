@@ -1,3 +1,26 @@
+function getCurrentTab(callback) {
+  chrome.tabs.query({
+    windowId: chrome.windows.WINDOW_ID_CURRENT,
+    active: true
+  }, function (tabs) {
+    callback(tabs[0]);
+  });
+}
+
+function onKeyboardShortcut(command) {
+  switch (command) {
+    case 'current-tab-link':
+      getCurrentTab(function (tab) {
+        var target = instance();
+        var label = target.getDefaultFormat();
+        var formatId = target.indexOfFormatByLabel(label);
+        var info = {};
+        onMenuItemClick(formatId, info, tab);
+      });
+      break;
+  }
+}
+chrome.commands.onCommand.addListener(onKeyboardShortcut);
 
 chrome.extension.onMessage.addListener(
   function (request, sender, sendResponse) {
@@ -84,6 +107,16 @@ function sendMessageToTab(tabId, message) {
   });
 }
 
+CreateLink.prototype.indexOfFormatByLabel = function (label) {
+  var formats = this.formats;
+  for (var i = 0, len = formats.length; i < len; i++) {
+    var item = formats[i];
+    if (item.label === label) {
+      return i;
+    }
+  }
+  return -1;
+};
 CreateLink.prototype.format = function (formatId) {
   return this.formats[formatId];
 }
@@ -140,17 +173,16 @@ function instance() {
 	return window.__instance;
 }
 
-function onMenuItemClick(contextMenuIdList, info, tab) {
+function onMenuItemClick(formatId, info, tab) {
   var url;
   if (info.mediaType === 'image') {
     url = info.srcUrl;
   } else {
-    url = info.linkUrl ||  info.pageUrl;
+    url = info.linkUrl || info.pageUrl || tab.url;
   }
   var text = info.selectionText || tab.title;
   var title = tab.title;
 
-  var formatId = contextMenuIdList[info.menuItemId];
   instance().formatLinkText(formatId, url, text, title, tab.id).pipe(function (linkText) {
     instance().copyToClipboard(linkText);
   });
@@ -181,7 +213,8 @@ function updateContextMenus() {
 
   chrome.contextMenus.onClicked.addListener(function (info, tab) {
     var n = Number(info.menuItemId.split(/-/).pop());
-    onMenuItemClick(contextMenuIdList, info, tab);
+    var formatId = contextMenuIdList[info.menuItemId];
+    onMenuItemClick(formatId, info, tab);
   })
 }
 

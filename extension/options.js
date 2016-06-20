@@ -4,16 +4,16 @@ window.addEventListener( 'load', function () {
   version.innerText = manifest.version;
 
   chrome.runtime.getBackgroundPage(function (backgroundWindow) {
-    var instance = backgroundWindow.instance();
-    var formats = instance.formats;
+    var target = backgroundWindow.instance();
+    var formats = target.formats;
 
     var defaultFormatButton = document.getElementById('set-default-format');
-    var currentDefault = instance.getDefaultFormat();
+    var currentDefault = target.getDefaultFormat();
     document.getElementById('current-default-format').textContent = String(currentDefault);
     defaultFormatButton.textContent = 'Set default to ' + currentDefault;
     defaultFormatButton.addEventListener('click', function () {
       var v = defaultFormatButton.getAttribute('data-selected-value');
-      instance.setDefaultFormat(v);
+      target.setDefaultFormat(v);
       document.getElementById('current-default-format').textContent = v;
     });
     
@@ -35,7 +35,7 @@ window.addEventListener( 'load', function () {
 
       ctable._listener.onUpdated = function () {
         var json = ctable.serialize();
-        instance.setFormatPreferences(json);
+        target.setFormatPreferences(json);
 
         // Update context menus
         chrome.extension.sendMessage({
