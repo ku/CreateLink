@@ -7,19 +7,43 @@ function getCurrentTab(callback) {
   });
 }
 
-function onKeyboardShortcut(command) {
-  switch (command) {
-    case 'current-tab-link':
-      getCurrentTab(function (tab) {
-        var target = instance();
-        var label = target.getDefaultFormat();
-        var formatId = target.indexOfFormatByLabel(label);
-        var info = {};
-        onMenuItemClick(formatId, info, tab);
-      });
+function flashBadge(type, text) {
+  // Taken from https://github.com/chitsaou/copy-as-markdown/
+  var color;
+
+  switch (type) {
+    case "success":
+      color = "#738a05";
       break;
+    case "fail":
+      color = "#d11b24";
+      text = "!";
+      break;
+    default:
+      return; // don't know what it is. quit.
   }
+
+  chrome.browserAction.setBadgeText({
+    "text": text
+  });
+
+  chrome.browserAction.setBadgeBackgroundColor({
+    "color": color
+  });
+
+  function clearBadge(type, text) {
+    chrome.browserAction.setBadgeText({
+      text: ""
+    });
+
+    chrome.browserAction.setBadgeBackgroundColor({
+      color: [0, 0, 0, 255] // opaque
+    });
+  }
+
+  setTimeout(clearBadge, 3000);
 }
+
 chrome.commands.onCommand.addListener(onKeyboardShortcut);
 
 chrome.extension.onMessage.addListener(
@@ -216,6 +240,21 @@ function updateContextMenus() {
     var formatId = contextMenuIdList[info.menuItemId];
     onMenuItemClick(formatId, info, tab);
   })
+}
+
+function onKeyboardShortcut(command) {
+  switch (command) {
+    case 'current-tab-link':
+      getCurrentTab(function (tab) {
+        var target = instance();
+        var label = target.getDefaultFormat();
+        var formatId = target.indexOfFormatByLabel(label);
+        var info = {};
+        onMenuItemClick(formatId, info, tab);
+        flashBadge('success', label);
+      });
+      break;
+  }
 }
 
 window.addEventListener('load', function () {
