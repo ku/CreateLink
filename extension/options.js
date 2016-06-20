@@ -13,7 +13,7 @@ window.addEventListener( 'load', function () {
     defaultFormatButton.textContent = 'Set default to ' + currentDefault;
     defaultFormatButton.addEventListener('click', function () {
       var v = defaultFormatButton.getAttribute('data-selected-value');
-      target.setDefaultFormat(v);
+      backgroundWindow.instance().setDefaultFormat(v);
       document.getElementById('current-default-format').textContent = v;
     });
     
@@ -35,7 +35,7 @@ window.addEventListener( 'load', function () {
 
       ctable._listener.onUpdated = function () {
         var json = ctable.serialize();
-        target.setFormatPreferences(json);
+        backgroundWindow.instance().setFormatPreferences(json);
 
         // Update context menus
         chrome.extension.sendMessage({
