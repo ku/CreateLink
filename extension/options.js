@@ -2,6 +2,7 @@ window.addEventListener( 'load', function () {
   var manifest = chrome.runtime.getManifest();
   var version = document.getElementById("version");
   version.innerText = manifest.version;
+  var defaultFormatValueStorageAttribute = 'data-selected-value';
 
   chrome.runtime.getBackgroundPage(function (backgroundWindow) {
     var target = backgroundWindow.instance();
@@ -9,12 +10,13 @@ window.addEventListener( 'load', function () {
 
     var defaultFormatButton = document.getElementById('set-default-format');
     var currentDefault = target.getDefaultFormat();
-    document.getElementById('current-default-format').textContent = String(currentDefault);
+    var currentDefaultEl = document.getElementById('current-default-format');
+    currentDefaultEl.textContent = String(currentDefault);
     defaultFormatButton.textContent = 'Set default to ' + currentDefault;
     defaultFormatButton.addEventListener('click', function () {
-      var v = defaultFormatButton.getAttribute('data-selected-value');
+      var v = defaultFormatButton.getAttribute(defaultFormatValueStorageAttribute);
       backgroundWindow.instance().setDefaultFormat(v);
-      document.getElementById('current-default-format').textContent = v;
+      currentDefaultEl.textContent = v;
     });
     
     try{
@@ -24,10 +26,12 @@ window.addEventListener( 'load', function () {
       
       ctable.onSelectedRowChanged(function (rowEvent) {
         try {
+          // This would happen while the user is in the middle of
+          //  editing/creating a new format. Safe to ignore, so we do.
           var currentSelectedRow = rowEvent.detail.current;
           var selectedName = currentSelectedRow.querySelector('span').textContent;
           defaultFormatButton.textContent = 'Set default to ' + selectedName;
-          defaultFormatButton.setAttribute('data-selected-value', selectedName);
+          defaultFormatButton.setAttribute(defaultFormatValueStorageAttribute, selectedName);
         } catch (e) {
           console.log(e);
         }
