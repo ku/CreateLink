@@ -145,13 +145,25 @@
 			nextCell.open();
 		}
 	}
+	CocoaTable.prototype.onSelectedRowChanged = function (callback) {
+		// FUTURE add cleanup of previous listener
+		return this._table.addEventListener('selectedRowChanged', callback);
+	}
 	CocoaTable.prototype.setSelectedRow = function (row) {
+		var prevRow = this._selectedRow;
 		if ( this._selectedRow ) {
 			removeClass(this._selectedRow, 'selected');
 		}
 		if ( row )
 			addClass(row, 'selected');
 		this._selectedRow = row;
+		var event = new CustomEvent('selectedRowChanged', {
+			'detail': {
+				'previous': prevRow,
+				'current': this._selectedRow
+			}
+		});
+		this._table.dispatchEvent(event);
 	}
 	CocoaTable.prototype.emptyRowObjectRepresentation = function () {
 		return this._index2name.reduce( function (j, i) {
