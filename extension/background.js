@@ -177,11 +177,12 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     d = _.Deferred().resolve(data);
   }
 
-  d.pipe(function (data) {
+  d = d.pipe(function (data) {
     if (def.filter) {
       var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
       if (m) {
-        data = data.replace(m[1], m[2]);
+        var r = new RegExp(m[1], m[3]);
+        data = data.replace(r, m[2]);
       }
     }
     return data;
