@@ -41,7 +41,7 @@ function flashBadge(type, text) {
     });
   }
 
-  setTimeout(clearBadge, 3000);
+  setTimeout(clearBadge, 1500);
 }
 
 chrome.commands.onCommand.addListener(onKeyboardShortcut);

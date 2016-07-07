@@ -18,64 +18,65 @@
       </div>
 			Firefox addon <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> alternative for Chrome.
 			<ul>
-				<li>Developped by <a href="http://ido.nu/kuma/">ku</a></li>
-				<li>Contributor
-          <ul class="contributors">
-            <li><a href="http://github.com/hnakamur/">hnakamur (Hiroaki Nakamura)</a></li>
-          </ul>
-        </li>
+				<li>Developped by <a href="http://ido.nu/kuma/">ku</a> and <a href="https://github.com/ku/CreateLink/graphs/contributors">Contributors</a><li>
 				<li>Icons by <a href="http://icontoaster.com/?free-icons-for-all">icontoaster.com</a></li>
 			</ul>
 		</div>
 	</div>
-	
-	<h2>Default Format</h2>
-	<p>Select the format from the table below that should be used when the keyboard shortcut is activated.</p>
-	<!-- when table row is selected, show selection below  -->
-	<p>Default is currently <em id="current-default-format">{{defaultFormatName}}</em></p>
-	<button id="set-default-format"></button>
 
-	<h2>Formats</h2>
+  <div>
+    <h2>Default Format</h2>
+    <p>Select the format from the table below that should be used when the keyboard shortcut is activated.</p>
+    <!-- when table row is selected, show selection below  -->
+    <p>Default is currently <select id="current-default-format"></select></p>
+    <p>
+    <a href="#" id="configure-shortcut">Configure shortcut</a>
+    </p>
+  </div>
+
 	<div id="configuration">
-		<table id="cocoatable" class="cocoatable"> 
-			<thead> 
-				<tr> 
-					<td id="column-name">Name</td> 
-					<td id="column-format">Format</td> 
-					<td id="column-filter">Filter</td> 
-				</tr> 
-			</thead> 
-		<tbody id="formats"> 
-		</tbody> 
-		</table> 
-		<div class="plus-minus-buttons" id="button-container"> 
-			<div id="cocoatable-button-plus" class="button plus">+</div> 
-			<div id="cocoatable-button-minus" class="button minus">-</div> 
-			<div style="clear:both"><!-- --></div> 
-		</div> 
+    <h2>Formats</h2>
+		<table id="cocoatable" class="cocoatable">
+			<thead>
+				<tr>
+					<td id="column-name">Name</td>
+					<td id="column-format">Format</td>
+					<td id="column-filter">Filter</td>
+				</tr>
+			</thead>
+		<tbody id="formats">
+		</tbody>
+		</table>
+		<div class="plus-minus-buttons" id="button-container">
+			<div id="cocoatable-button-plus" class="button plus">+</div>
+			<div id="cocoatable-button-minus" class="button minus">-</div>
+			<div style="clear:both"><!-- --></div>
+		</div>
 	</div>
 
-	<h2>Variables</h2>
-	<div>
-	Create Link recognizes some <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> compatible variables.
-	</div>
-	<dl id="variables">
-		<dt>%text%</dt>
-		<dd>Selected text or page title. All newlines are converted to " ".</dd>
-		<dt>%text_n%</dt>
-		<dd>Selected text or page title. All newlines are copied as they are.</dd>
-		<dt>%text_br%</dt>
-		<dd>Selected text or page title. All newlines are converted to "&lt;br /&gt;\n".</dd>
-		<dt>%text_md%</dt>
-    <dd>Selected text or page title. All cahracters listed in <a href="http://daringfireball.net/projects/markdown/syntax#backslash">Markdown specification</a> will be escaped with backslash.</dd>
-		<dt>%title%</dt>
-		<dd>Page title.</dd>
-		<dt>%newline%</dt>
-		<dd>Newline(\n).</dd>
-		<dt>%htmlEscapedText%</dt>
-		<dd>Selected text or page title. Some unsafe characters (<em>&amp;</em><em>&lt;</em><em>&gt;</em><em>&apos;</em><em>&quot;</em>) are converted to corresponding entity reference.</dd>
-		<dt>%input%</dt>
-		<dd>Popups a dialog to input text.</dd>
-	</dl>
+  <div>
+    <h2>Variables</h2>
+    <div>
+    Create Link recognizes some <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> compatible variables.
+    </div>
+    <dl id="variables">
+      <dt>%text%</dt>
+      <dd>Selected text or page title. All newlines are converted to " ".</dd>
+      <dt>%text_n%</dt>
+      <dd>Selected text or page title. All newlines are copied as they are.</dd>
+      <dt>%text_br%</dt>
+      <dd>Selected text or page title. All newlines are converted to "&lt;br /&gt;\n".</dd>
+      <dt>%text_md%</dt>
+      <dd>Selected text or page title. All cahracters listed in <a href="http://daringfireball.net/projects/markdown/syntax#backslash">Markdown specification</a> will be escaped with backslash.</dd>
+      <dt>%title%</dt>
+      <dd>Page title.</dd>
+      <dt>%newline%</dt>
+      <dd>Newline(\n).</dd>
+      <dt>%htmlEscapedText%</dt>
+      <dd>Selected text or page title. Some unsafe characters (<em>&amp;</em><em>&lt;</em><em>&gt;</em><em>&apos;</em><em>&quot;</em>) are converted to corresponding entity reference.</dd>
+      <dt>%input%</dt>
+      <dd>Popups a dialog to input text.</dd>
+    </dl>
+  </div>
 </body>
 </html>

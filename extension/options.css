@@ -2,6 +2,16 @@ body {
   padding-bottom: 2em;
 }
 
+body > div {
+  margin: 2em;
+  position: relative;
+}
+
+body > div > h2 {
+  position: relative;
+  left: -1em
+}
+
 #about {
   display: -webkit-box;
 }

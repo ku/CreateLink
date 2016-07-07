@@ -71,15 +71,15 @@
 
 
 
-	function CocoaTable(data, headers) {
+	function CocoaTable(data, headers, listener) {
 		this._cellObjects = [];
 		this._editingCell = null;
 		this._selectedRow = null;
 		this._index2name = headers;
-		this._listener = {};
+		this._listener = listener || {};
 
 		this._table = document.getElementById('cocoatable');
-		this.initalize(data);
+		this.initialize(data);
 		this._cells = 0;
 
 
@@ -100,6 +100,7 @@
 		this._editbox = null;
 		this._listener = opts.listener;
 		this._textContainer = document.createElement('span');
+		this._modelValue = opts.text
 		setText(this._textContainer, opts.text);
 		this._e.appendChild(this._textContainer);
 
@@ -154,16 +155,18 @@
 		if ( this._selectedRow ) {
 			removeClass(this._selectedRow, 'selected');
 		}
-		if ( row )
+		if ( row ) {
 			addClass(row, 'selected');
+    }
 		this._selectedRow = row;
-		var event = new CustomEvent('selectedRowChanged', {
-			'detail': {
-				'previous': prevRow,
-				'current': this._selectedRow
-			}
-		});
-		this._table.dispatchEvent(event);
+    if ( this._listener.onSelectedRowChanged ) {
+      this._listener.onSelectedRowChanged.call(this._listener, {
+        'detail': {
+          'previous': prevRow,
+          'current': this._selectedRow
+        }
+      });
+    }
 	}
 	CocoaTable.prototype.emptyRowObjectRepresentation = function () {
 		return this._index2name.reduce( function (j, i) {
@@ -195,20 +198,33 @@ try	{
 		}
 		}, true);
 		minus.addEventListener( 'click', function (ev) {
-			if ( self._selectedRow == null )
+			if ( self._selectedRow == null ) {
 				return;
-			
-			//var id = self._selectedRow.getAttribute('id');
-			self._selectedRow.parentNode.removeChild(self._selectedRow);
-			self.setSelectedRow(null);
+      }
 
-			self.updated();
-
+      self.emit('removing', self.elementIndex(self._selectedRow), self._selectedRow);
+      self.removeRow(self._selectedRow);
+      self.setSelectedRow(null);
+      self.emit('updated');
 			ev.preventDefault();
 			ev.stopPropagation();
 		}, true);
-
 	}
+
+	CocoaTable.prototype.elementIndex = function (e) {
+    var children = e.parentNode.querySelectorAll(e.tagName);
+    for(var i = 0; i < children.length; i++) {
+      if (children[i] == e) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+	CocoaTable.prototype.removeRow = function (row) {
+    row.parentNode.removeChild(row);
+  }
+
 	CocoaTable.Cell.prototype.element = function () {
 		return this._e;
 	}
@@ -272,7 +288,7 @@ try	{
 		if ( empty ) {
 			var row = this._e.parentNode;
 			row.parentNode.removeChild(row);
-			return true;	
+			return true;
 		}
 		return false
 	}
@@ -288,13 +304,15 @@ try	{
 			this._listener.unselectRow();
 	}
 	CocoaTable.Cell.prototype.commit = function () {
+    oldValue = this._modelValue;
+    this._modelValue = this._editbox.value;
 		setText(this._textContainer, this._editbox.value);
 
 		this.close();
 
 		if ( this._listener ) {
 			this._listener.unselectRow();
-			this._listener.updated();
+			this._listener.emit('updated', this._modelValue, oldValue);
 		}
 	}
 	CocoaTable.prototype.findCellObjectForElmenet = function (e) {
@@ -352,7 +370,7 @@ try	{
 		return row;
 	}
 
-	CocoaTable.prototype.initalize = function (formats) {
+	CocoaTable.prototype.initialize = function (formats) {
 		var self = this;
 			formats.map( function (n, i) {
 				self.addRow.apply(self, [n, i], false);
@@ -370,8 +388,10 @@ try	{
 		}
 		this._editingCell = cell;
 	}
-	CocoaTable.prototype.updated = function () {
-		if ( this._listener.onUpdated )
-			this._listener.onUpdated();
-	}
-
+  CocoaTable.prototype.emit = function (eventName) {
+    var name = 'on' + eventName.substring(0, 1).toUpperCase() + eventName.substring(1);
+    var f = this._listener[name];
+    if (f) {
+      return f.apply(this._listener, Array.prototype.slice.call(arguments).slice(1));
+    }
+  }

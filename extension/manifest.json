@@ -29,9 +29,9 @@
    }],
    "commands": {
     "current-tab-link": {
-      "description": "current tab in default format"
+      "description": "Current tab in default format"
     }
    },
    "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ],
-   "version": "0.2.11"
+   "version": "0.3.0"
 }
