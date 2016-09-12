@@ -1,3 +1,50 @@
+function getCurrentTab(callback) {
+  chrome.tabs.query({
+    windowId: chrome.windows.WINDOW_ID_CURRENT,
+    active: true
+  }, function (tabs) {
+    callback(tabs[0]);
+  });
+}
+
+function flashBadge(type, text) {
+  // Taken from https://github.com/chitsaou/copy-as-markdown/
+  var color;
+
+  switch (type) {
+    case "success":
+      color = "#738a05";
+      break;
+    case "fail":
+      color = "#d11b24";
+      text = "!";
+      break;
+    default:
+      return; // don't know what it is. quit.
+  }
+
+  chrome.browserAction.setBadgeText({
+    "text": text
+  });
+
+  chrome.browserAction.setBadgeBackgroundColor({
+    "color": color
+  });
+
+  function clearBadge(type, text) {
+    chrome.browserAction.setBadgeText({
+      text: ""
+    });
+
+    chrome.browserAction.setBadgeBackgroundColor({
+      color: [0, 0, 0, 255] // opaque
+    });
+  }
+
+  setTimeout(clearBadge, 1500);
+}
+
+chrome.commands.onCommand.addListener(onKeyboardShortcut);
 
 chrome.extension.onMessage.addListener(
   function (request, sender, sendResponse) {
@@ -28,17 +75,37 @@ CreateLink.prototype.copyToClipboard = function (text) {
   document.execCommand("copy");
 }
 
+var formatPreferencesKey = 'format_preferences';
+var defaultFormatKey = 'defaultFormat';
+
+CreateLink.prototype.setDefaultFormat = function (value) {
+  localStorage[defaultFormatKey] = value;
+};
+
+CreateLink.prototype.getDefaultFormat = function () {
+  return localStorage[defaultFormatKey];
+};
+
+CreateLink.prototype.setFormatPreferences = function (formatsString) {
+  localStorage[formatPreferencesKey] = formatsString;
+};
+
+CreateLink.prototype.getFormatPreferences = function () {
+  return JSON.parse(localStorage[formatPreferencesKey] || '[]');
+};
+
 CreateLink.prototype.readFormats = function () {
   var formats;
   try {
-    formats = JSON.parse( localStorage.format_preferences );
+    formats = this.getFormatPreferences();
   } catch(e) {
   }
-  if ( !formats ) {
+  if ( !formats || formats.length == 0 ) {
     formats = CreateLink.default_formats;
   }
   return formats;
-}
+};
+
 function escapeHTML(text) {
   return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
 }
@@ -64,6 +131,16 @@ function sendMessageToTab(tabId, message) {
   });
 }
 
+CreateLink.prototype.indexOfFormatByLabel = function (label) {
+  var formats = this.formats;
+  for (var i = 0, len = formats.length; i < len; i++) {
+    var item = formats[i];
+    if (item.label === label) {
+      return i;
+    }
+  }
+  return -1;
+};
 CreateLink.prototype.format = function (formatId) {
   return this.formats[formatId];
 }
@@ -95,7 +172,7 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     replace(/%time%/g, date_hour + ":" + date_min + ":" + date_sec).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
-  
+
   var m = data.match(/%input%/g);
   if (m) {
     var inputDeferreds = m.map(function () {
@@ -113,11 +190,12 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     d = _.Deferred().resolve(data);
   }
 
-  d.pipe(function (data) {
+  d = d.pipe(function (data) {
     if (def.filter) {
       var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
       if (m) {
-        data = data.replace(m[1], m[2]);
+        var r = new RegExp(m[1], m[3]);
+        data = data.replace(r, m[2]);
       }
     }
     return data;
@@ -133,17 +211,16 @@ function instance() {
 	return window.__instance;
 }
 
-function onMenuItemClick(contextMenuIdList, info, tab) {
+function onMenuItemClick(formatId, info, tab) {
   var url;
   if (info.mediaType === 'image') {
     url = info.srcUrl;
   } else {
-    url = info.linkUrl ||  info.pageUrl;
+    url = info.linkUrl || info.pageUrl || tab.url;
   }
   var text = info.selectionText || tab.title;
   var title = tab.title;
 
-  var formatId = contextMenuIdList[info.menuItemId];
   instance().formatLinkText(formatId, url, text, title, tab.id).pipe(function (linkText) {
     instance().copyToClipboard(linkText);
   });
@@ -174,13 +251,36 @@ function updateContextMenus() {
 
   chrome.contextMenus.onClicked.addListener(function (info, tab) {
     var n = Number(info.menuItemId.split(/-/).pop());
-    onMenuItemClick(contextMenuIdList, info, tab);
+    var formatId = contextMenuIdList[info.menuItemId];
+    onMenuItemClick(formatId, info, tab);
   })
+}
+
+function onKeyboardShortcut(command) {
+  switch (command) {
+    case 'current-tab-link':
+      getCurrentTab(function (tab) {
+        var target = instance();
+        var label = target.getDefaultFormat();
+        var formatId = target.indexOfFormatByLabel(label);
+        if (formatId >= 0) {
+          var info = {};
+          onMenuItemClick(formatId, info, tab);
+          flashBadge('success', label);
+        } else {
+          // User has never set the default or else the previously-defaulted
+          //  format was probably removed, so let user know,
+          //  but don't automatically reset the default for her/him
+          flashBadge('fail');
+        }
+      });
+      break;
+  }
 }
 
 window.addEventListener('load', function () {
   updateContextMenus();
-  
+
   document.addEventListener('copy', function (ev) {
     ev.preventDefault();
 
