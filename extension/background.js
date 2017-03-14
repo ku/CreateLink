@@ -124,9 +124,9 @@ function showPrompt(text, pos, subject) {
 }
 
 function sendMessageToTab(tabId, message) {
-  return new Promise(function (resolve) {
+  return _.Deferred(function (d) {
     chrome.tabs.sendMessage(tabId, message, function (res) {
-      resolve(res);
+      d.resolve(res);
     });
   });
 }
@@ -162,10 +162,10 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
 
   var m = data.match(/%input%/g);
   if (m) {
-    var inputPromises = m.map(function () {
-      return sendMessageToTab(tabId, {type: 'showInputDialog'});
+    var inputDeferreds = m.map(function () {
+      return sendMessageToTab(tabId, 'showInputDialog');
     });
-    d = Promise.all(inputPromises).then(function () {
+    d = _.when.apply(_, inputDeferreds).pipe(function () {
       var inputs = _.toArray(arguments);
       var index = 0;
       data = data.replace(/%input%/g, function (s) {
@@ -174,17 +174,15 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
       return data;
     });
   } else {
-    d = Promise.resolve(data);
+    d = _.Deferred().resolve(data);
   }
 
-  d = d.then(function (data) {
+  d = d.pipe(function (data) {
     if (def.filter) {
       var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
       if (m) {
         var r = new RegExp(m[1], m[3]);
         data = data.replace(r, m[2]);
-      } else {
-        return sendMessageToTab(tabId, {type: 'evaluateFilter', code: def.filter, string: data})
       }
     }
     return data;
@@ -210,7 +208,7 @@ function onMenuItemClick(formatId, info, tab) {
   var text = info.selectionText || tab.title;
   var title = tab.title;
 
-  instance().formatLinkText(formatId, url, text, title, tab.id).then(function (linkText) {
+  instance().formatLinkText(formatId, url, text, title, tab.id).pipe(function (linkText) {
     instance().copyToClipboard(linkText);
   });
 }
