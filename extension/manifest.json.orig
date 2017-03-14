@@ -1,8 +1,7 @@
 {
-   "version": "0.4.0",
    "manifest_version": 2,
    "background": {
-     "scripts": ["js/background.js"],
+     "page": "background.html",
      "persistent": false
    },
    "browser_action": {
@@ -33,5 +32,6 @@
       "description": "Current tab in default format"
     }
    },
-   "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ]
+   "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ],
+   "version": "0.3.3"
 }

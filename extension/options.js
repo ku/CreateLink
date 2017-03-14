@@ -2,19 +2,18 @@ class OptionsPage {
   initialize() {
     this.fillVersion()
 
-    chrome.runtime.getBackgroundPage( (backgroundWindow) => {
-      this.bg = backgroundWindow.instance();
+    chrome.runtime.sendMessage({request: 'formats'}, ({formats, defaultFormat}) => {
       this.select = document.getElementById("current-default-format");
 
-      this.setupFormatOptions();
-      this.setupTable(this.bg.formats);
+      this.setupFormatOptions(formats, defaultFormat);
+      this.setupTable(formats);
 
       this.select.addEventListener('change', (ev) => {
         var s = this.select;
         var o = s.options[s.selectedIndex];
-        this.bg.setDefaultFormat(o.value);
-      }, false)
 
+        chrome.runtime.sendMessage({request: 'setDefaultFormat', format: o.value})
+      }, false)
     });
 
     document.getElementById("configure-shortcut").addEventListener('click', function () {
@@ -37,8 +36,7 @@ class OptionsPage {
     })
   }
 
-  setupFormatOptions() {
-    var formats = this.bg.formats
+  setupFormatOptions(formats, defaultFormat) {
     var o = document.createElement('option');
     o.textContent = '(not selected)';
     this.select.appendChild(o);
@@ -49,7 +47,7 @@ class OptionsPage {
       o.textContent = format.label;
       this.select.appendChild(o);
     })
-    this.setSelectedFormat(this.bg.getDefaultFormat());
+    this.setSelectedFormat(defaultFormat)
   }
 
   renameOption(newValue, oldValue) {
@@ -71,11 +69,12 @@ class OptionsPage {
       onUpdated: (newValue, oldValue) => {
         var json = ctable.serialize();
 
-        this.bg.setFormatPreferences(json);
         this.renameOption(newValue, oldValue);
 
+        chrome.runtime.sendMessage({request: 'updateFormats', formats: json})
+
         // Update context menus
-        chrome.extension.sendMessage({
+        chrome.runtime.sendMessage({
           command: 'updateContextMenus'
         });
       }
