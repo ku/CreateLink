@@ -148,6 +148,17 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
   var d;
 
   var def = this.format(formatId);
+  var date = new Date();
+  var date_month = date.getMonth() + 1;
+  if ( date_month < 10 ){ date_month = "0" + date_month; }
+  var date_day = date.getDate();
+  if ( date_day < 10 ){ date_day = "0" + date_day; }
+  var date_hour = date.getHours();
+  if ( date_hour < 10 ){ date_hour = "0" + date_hour; }
+  var date_min = date.getMinutes();
+  if ( date_min < 10 ){ date_min = "0" + date_min; }
+  var date_sec = date.getSeconds();
+  if ( date_sec < 10 ){ date_sec = "0" + date_sec; }
   var data = def.format.
     replace(/%url%/g, url).
     replace(/%text%/g, text.replace(/\n/g, ' ')).
@@ -157,6 +168,8 @@ CreateLink.prototype.formatLinkText = function (formatId, url, text, title, tabI
     replace(/%title%/g, title).
     replace(/%newline%/g, '\n').
     replace(/%htmlEscapedText%/g, escapeHTML(text)).
+    replace(/%date%/g, date.getFullYear()  + "-" + date_month + "-" + date_day).
+    replace(/%time%/g, date_hour + ":" + date_min + ":" + date_sec).
     replace(/\\t/g, '\t').
     replace(/\\n/g, '\n');
 
