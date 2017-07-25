@@ -9,13 +9,15 @@ module.exports = class ContextMenuHandler {
     this.updateContextMenus(formats)
 
     chrome.contextMenus.onClicked.addListener(this.onMenuItemClicked.bind(this))
-    chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
-        if ( request.command == 'updateContextMenus' ) {
-          // options page requests upadting the items
-          this.updateContextMenus();
-        }
-      }
-    );
+    chrome.runtime.onMessage.addListener( this.onMessage.bind(this) )
+  }
+
+  onMessage(request, sender, sendResponse) {
+    if ( request.request == 'updateFormats' ) {
+      const formats = JSON.parse(request.formats)
+      // options page requests upadting the items
+      this.updateContextMenus(formats)
+    }
   }
 
   formatIndexOfMenuItemId(menuItemId) {

@@ -59,25 +59,26 @@ class OptionsPage {
     } )
   }
 
+  onRemoving(index) {
+    this.select.removeChild(this.select.options[index + 1]);
+  }
+
+  onUpdated(ctable, newValue, oldValue) {
+    var json = ctable.serialize();
+
+    this.renameOption(newValue, oldValue);
+
+    chrome.runtime.sendMessage({request: 'updateFormats', formats: json})
+  }
+
   setupTable(formats) {
     var ctable = new CocoaTable(formats, [
       'label', 'format', 'filter'
     ], {
-      onRemoving: (index) => {
-        this.select.removeChild(this.select.options[index + 1]);
-      },
+      onRemoving: this.onRemoving.bind(this),
       onUpdated: (newValue, oldValue) => {
-        var json = ctable.serialize();
-
-        this.renameOption(newValue, oldValue);
-
-        chrome.runtime.sendMessage({request: 'updateFormats', formats: json})
-
-        // Update context menus
-        chrome.runtime.sendMessage({
-          command: 'updateContextMenus'
-        });
-      }
+        this.onUpdated(ctable, newValue, oldValue)
+      },
     });
   }
 }

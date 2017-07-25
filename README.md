@@ -28,7 +28,7 @@ The configuration above gives you following text.
 webpack is used for building application code. Run
 
 ```sh
-make webpack
+make watch
 ```
 to watch the changes and generate js files.
 
