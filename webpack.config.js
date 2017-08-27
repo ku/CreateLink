@@ -1,5 +1,6 @@
 "use strict"
 
+const path = require("path")
 const webpack = require("webpack")
 
 module.exports = {
@@ -10,7 +11,7 @@ module.exports = {
   //devtool: 'source-map',
   cache: true,
   output: {
-    path: `extension/js`,
+    path: `${path.resolve(__dirname, 'extension/js')}`,
     publicPath: '/',
     filename: "[name].js"
   },
