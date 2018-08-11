@@ -19,12 +19,13 @@ class CreateLink {
     return Promise.resolve(data);
   }
 
-  formatLinkText(def, url, text, title, inputs) {
+  formatLinkText(def, url, text, textonly, title, inputs) {
     text = text || ''
 
     var data = def.format.
       replace(/%url%/g, url).
       replace(/%text%/g, text.replace(/\n/g, ' ')).
+      replace(/%textonly%/g, textonly.replace(/\n/g, ' ')).
       replace(/%text_n%/g, text).
       replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
       replace(/%text_md%/g, text.replace(/[|\\`*_{}\[\]()#+\-.!]/g, '\\$&')).
@@ -60,15 +61,16 @@ class CreateLink {
       url = info.linkUrl || info.pageUrl || tab.url;
     }
     var text = info.selectionText || tab.title;
+    var textonly = info.selectionText;
     var title = tab.title;
 
     var def = this.formats[formatId]
-    return this.formatString(tab.id, def, url, text, title)
+    return this.formatString(tab.id, def, url, text, textonly, title)
   }
 
-  formatString(tabId, def, url, text, title) {
+  formatString(tabId, def, url, text, textonly, title) {
     return this.getInputs(def, tabId).then( (inputs) => {
-      const linkText = this.formatLinkText(def, url, text, title, inputs)
+      const linkText = this.formatLinkText(def, url, text, textonly, title, inputs)
       return this.applyFilter(tabId, def, linkText)
     })
   }

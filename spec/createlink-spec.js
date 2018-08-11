@@ -77,6 +77,14 @@ describe("CreateLink", () => {
       var t = createLink.formatLinkText({format: "%text%"}, url, "ONE\nTWO", title, [])
       expect(t).toEqual("ONE TWO")
     })
+    it("replaces %textonly%", () => {
+      var t = createLink.formatLinkText({format: "%textonly%"}, url, "ONE\nTWO", title, [])
+      expect(t).toEqual("ONE TWO")
+    })
+    it("replaces %textonly%", () => {
+      var t = createLink.formatLinkText({format: "%textonly%"}, url, undefined, title, [])
+      expect(t).toEqual(title)
+    })
     xit("replaces %text_n%", () => {})
     xit("replaces %text_br%", () => {})
     xit("replaces %text_md%", () => {})
