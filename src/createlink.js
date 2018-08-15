@@ -27,6 +27,8 @@ class CreateLink {
       replace(/%url%/g, url).
       replace(/%text%/g, text.replace(/\n/g, ' ')).
       replace(/%textonly%/g, textonly.replace(/\n/g, ' ')).
+      // TODO: allow customizing this, eg using regex replace
+      replace(/%onnonemptyselection%/g, textonly == "" ? " TITLE: " : "").
       replace(/%text_n%/g, text).
       replace(/%text_br%/g, text.replace(/\n/g, '<br />\n')).
       replace(/%text_md%/g, text.replace(/[|\\`*_{}\[\]()#+\-.!]/g, '\\$&')).
