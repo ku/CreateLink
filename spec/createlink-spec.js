@@ -70,32 +70,32 @@ describe("CreateLink", () => {
     var title = 'pageTitle'
     var url = 'http://example.com/'
     it("replaces %url%", () => {
-      var t = createLink.formatLinkText({format: "%url%"}, url, undefined, title, [])
+      var t = createLink.formatLinkText({format: "%url%"}, url, undefined, undefined, title, [])
       expect(t).toEqual(url)
     })
     it("replaces %text%", () => {
-      var t = createLink.formatLinkText({format: "%text%"}, url, "ONE\nTWO", title, [])
+      var t = createLink.formatLinkText({format: "%text%"}, url, "ONE\nTWO", "ONE\nTWO", title, [])
       expect(t).toEqual("ONE TWO")
     })
-    it("replaces %textonly%", () => {
-      var t = createLink.formatLinkText({format: "%textonly%"}, url, "ONE\nTWO", title, [])
+    it("replaces %textonly% with selection", () => {
+      var t = createLink.formatLinkText({format: "%textonly%"}, url, "ONE\nTWO", "ONE\nTWO", title, [])
       expect(t).toEqual("ONE TWO")
     })
-    it("replaces %textonly%", () => {
-      var t = createLink.formatLinkText({format: "%textonly%"}, url, undefined, title, [])
-      expect(t).toEqual(title)
+    it("replaces %textonly% no selection", () => {
+      var t = createLink.formatLinkText({format: "%textonly%"}, url, undefined, undefined, title, [])
+      expect(t).toEqual('')
     })
     xit("replaces %text_n%", () => {})
     xit("replaces %text_br%", () => {})
     xit("replaces %text_md%", () => {})
     it("replaces %title%", () => {
-      var t = createLink.formatLinkText({format: "%title%"}, url, undefined, title, [])
+      var t = createLink.formatLinkText({format: "%title%"}, url, undefined, undefined, title, [])
       expect(t).toEqual(title)
     })
     xit("replaces %newline%", () => {})
     xit("replaces %htmlEscapedText%", () => {})
     it("replaces \t\r\n", () => {
-      var t = createLink.formatLinkText({format: "\\t\\r\\n"}, url, undefined, title, [])
+      var t = createLink.formatLinkText({format: "\\t\\r\\n"}, url, undefined, undefined, title, [])
       expect(t).toEqual("\t\r\n")
     })
   })

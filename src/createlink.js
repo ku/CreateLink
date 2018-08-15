@@ -21,6 +21,7 @@ class CreateLink {
 
   formatLinkText(def, url, text, textonly, title, inputs) {
     text = text || ''
+    textonly = textonly || ''
 
     var data = def.format.
       replace(/%url%/g, url).
