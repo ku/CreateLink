@@ -158,6 +158,7 @@ CreateLink.default_formats = [
     {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
     {label: "markdown", format: '[%text_md%](%url%)' },
     {label: "mediaWiki", format: '[%url% %text%]' },
+    {label: "orgmode", format: '[[%url%][%text_md%]]' },
 ];
 
 module.exports = CreateLink
