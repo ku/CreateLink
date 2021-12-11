@@ -1,11 +1,11 @@
 {
-   "version": "0.4.1",
-   "manifest_version": 2,
+   "name": "Create Link",
+   "version": "0.5.0",
+   "manifest_version": 3,
    "background": {
-     "scripts": ["js/background.js"],
-     "persistent": false
+     "service_worker": "js/background.js"
    },
-   "browser_action": {
+   "action": {
       "default_icon": "icon64.png",
       "default_title": "Create Link",
       "default_popup": "popup.html"
@@ -17,7 +17,6 @@
       "32": "icon32.png",
       "64": "icon64.png"
    },
-   "name": "Create Link",
    "options_page": "options.html",
    "content_scripts" : [{
      "matches"    : ["http://*/*", "https://*/*", "file:///*/*"],
@@ -26,12 +25,16 @@
        "content.js"
      ],
      "run_at"     : "document_end",
-     "all_frames" : true
+     "all_frames" : false
    }],
    "commands": {
     "current-tab-link": {
       "description": "Current tab in default format"
     }
    },
-   "permissions": [ "tabs", "http://*/*", "https://*/*", "contextMenus" ]
+   "host_permissions": [
+     "http://*/*",
+     "https://*/*"
+   ],
+   "permissions": [ "tabs", "contextMenus", "storage", "clipboardWrite" ]
 }

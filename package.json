@@ -1,11 +1,7 @@
 {
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-batch": "^1.0.5",
-    "gulp-jasmine": "^2.4.2",
-    "gulp-plumber": "^1.1.0",
-    "gulp-watch": "^4.3.11",
     "gutil": "^1.6.4",
-    "webpack": "^2.2.1"
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.9.1"
   }
 }

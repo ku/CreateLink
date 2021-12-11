@@ -1,5 +1,6 @@
 
 const utils = require('./utils')
+const fmt = require('./formats');
 
 module.exports = class MessageBroker {
   constructor(createLink) {
@@ -11,7 +12,7 @@ module.exports = class MessageBroker {
   }
 
   sendMessage(msg, tab, cb) {
-    return this.onMessage(msg, {tab: tab}, cb)
+    return this.onMessage(msg, { tab: tab }, cb)
   };
 
   onMessage(msg, sender, sendResponse) {
@@ -20,7 +21,7 @@ module.exports = class MessageBroker {
       sender = null
     }
     if (!sendResponse) {
-      sendResponse = function () {}
+      sendResponse = function () { }
     }
 
     const method = this["on" + msg.request.replace(/^./, s => s.toUpperCase())]
@@ -31,46 +32,24 @@ module.exports = class MessageBroker {
     }
   }
 
-  onFormats(msg, sender, sendResponse) {
-    sendResponse({
-      formats: JSON.parse(JSON.stringify(this.createLink.formats)),
-      defaultFormat: this.createLink.getDefaultFormat(),
-    })
-  }
-
-
-  onSetDefaultFormat(msg, sender, sendResponse) {
-    this.createLink.setDefaultFormat(msg.format);
-  }
-
   onUpdateFormats(msg, sender, sendResponse) {
-    this.createLink.setFormatPreferences(msg.formats);
+    // do nothing.
   }
 
-  onCopyInFormat(msg, sender, sendResponse) {
-    let formatId = msg.format
+  // only shortcut handler uses this message.
+  async onCopyInFormat(msg, sender, sendResponse) {
+     fmt.load().then( async() => {
+       const def = fmt.getDefaultFormat()
+       const tab = await utils.getCurrentTab();
+       utils.getSelectionText(tab.id).then((selectionText) => {
+         return { selectionText }
+       }).then((info) => {
+         return this.createLink.formatInTab(def, info, tab).then((link) => {
+           utils.sendMessageToTab(tab.id, { type: 'copyToClipboard', link })
+         })
+       })
+       sendResponse({ formatName: def.label })
 
-    if (formatId === -1) {
-      formatId = this.createLink.getDefaultFormatId()
-    }
-
-    if (formatId >= 0) {
-      const tab = sender && sender.tab;
-
-      (tab ? Promise.resolve(tab) : utils.getCurrentTab()).then( (tab) => {
-        (msg.info ? Promise.resolve(msg.info) : utils.getSelectionText(tab.id).then( (selectionText) => {
-          return { selectionText }
-        })).then( (info) => {
-          return this.createLink.formatInTab(formatId, info, tab).then( (linkText) => {
-            this.createLink.copyToClipboard(linkText)
-
-            const formatName = this.createLink.formats[formatId].label
-            sendResponse({formatName})
-          })
-        })
-      })
-    } else {
-      sendResponse(null)
-    }
+     })
   }
 }

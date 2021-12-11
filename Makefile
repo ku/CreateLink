@@ -10,18 +10,14 @@ CRXMAKE_DIR=./crxmake
 TMPFILELIST=/tmp/filelist
 
 $(NAME)-$(VERSION).zip: $(SRC)
-	./node_modules/.bin/jasmine || exit
-	find "$(EXTENSIONDIR)" | sed 's/$(EXTENSIONDIR)/./' > $(TMPFILELIST)
+	find "$(EXTENSIONDIR)" | sed 's/$(EXTENSIONDIR)/./' | grep -v .js.map > $(TMPFILELIST)
 	cd $(EXTENSIONDIR); cat $(TMPFILELIST) | zip -q $(DIRNAME)/$@ -@
 
 $(SRC):
-	./node_modules/.bin/webpack
-
-test:
-	./node_modules/.bin/jasmine
+	./node_modules/.bin/webpack --mode=production
 
 watch:
-	./node_modules/.bin/webpack -w
+	./node_modules/.bin/webpack -w --mode=development
 
 clean:
 	rm $(NAME).crx $(NAME).zip

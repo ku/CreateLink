@@ -1,9 +1,9 @@
 
 const utils = require('./utils')
+const fmt = require('./formats')
 
 class CreateLink {
-  get formats() {
-    return this.readFormats();
+  constructor() {
   }
 
   applyFilter(tabId, def, data) {
@@ -52,7 +52,7 @@ class CreateLink {
     }
   }
 
-  formatInTab(formatId, info, tab) {
+  async formatInTab(def, info, tab) {
     var url;
     if (info.mediaType === 'image') {
       url = info.srcUrl;
@@ -62,79 +62,27 @@ class CreateLink {
     var text = info.selectionText || tab.title;
     var title = tab.title;
 
-    var def = this.formats[formatId]
     return this.formatString(tab.id, def, url, text, title)
   }
 
-  formatString(tabId, def, url, text, title) {
-    return this.getInputs(def, tabId).then( (inputs) => {
-      const linkText = this.formatLinkText(def, url, text, title, inputs)
-      return this.applyFilter(tabId, def, linkText)
-    })
+  async formatString(tabId, def, url, text, title) {
+    const inputs = await this.getInputs(def, tabId)
+    const linkText = this.formatLinkText(def, url, text, title, inputs)
+    return this.applyFilter(tabId, def, linkText)
   }
 
-  copyToClipboard(text) {
-    const backgroundPage = chrome.extension.getBackgroundPage()
-    let textarea = document.getElementById('clipboard_object');
-    if (!textarea) {
-      textarea = backgroundPage.document.createElement('textarea')
-      textarea.setAttribute('id', 'clipboard_object')
-      backgroundPage.document.body.appendChild(textarea)
-    }
-    textarea.value = text;
-    textarea.select();
-    document.execCommand("copy");
-  }
-
-  setDefaultFormat(value) {
-    localStorage[defaultFormatKey] = value;
-  };
-
-  getDefaultFormat() {
-    return localStorage[defaultFormatKey];
-  };
-
-  getDefaultFormatId() {
-    const formatName = this.getDefaultFormat()
-    return this.indexOfFormatByLabel(formatName);
-  }
-
-  setFormatPreferences(formatsString) {
-    localStorage[formatPreferencesKey] = formatsString;
-  };
-
-  getFormatPreferences() {
-    return JSON.parse(localStorage[formatPreferencesKey] || '[]');
-  };
-
-  readFormats() {
-    var formats;
-    try {
-      formats = this.getFormatPreferences();
-    } catch(e) {
-    }
-    if ( !formats || formats.length == 0 ) {
-      formats = CreateLink.default_formats;
-    }
-    return formats;
-  };
   indexOfFormatByLabel(label) {
-    var formats = this.formats;
+    const formats = fmt.getFormats();
     for (var i = 0, len = formats.length; i < len; i++) {
       var item = formats[i];
       if (item.label === label) {
         return i;
       }
     }
-    return -1;
+    // use plain text as default format.
+    return 1;
   };
-  static defaultFormats() {
-    return CreateLink.default_formats
-  }
 }
-
-var formatPreferencesKey = 'format_preferences';
-var defaultFormatKey = 'defaultFormat';
 
 function escapeHTML(text) {
   return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
@@ -152,12 +100,5 @@ function showPrompt(text, pos, subject) {
   var s = window.prompt(msg);
   return (s === null) ? "" : s;
 }
-
-CreateLink.default_formats = [
-    {label: "Plain text", format: '%text% %url%' },
-    {label: "HTML", format: '<a href="%url%">%htmlEscapedText%</a>' },
-    {label: "markdown", format: '[%text_md%](%url%)' },
-    {label: "mediaWiki", format: '[%url% %text%]' },
-];
 
 module.exports = CreateLink

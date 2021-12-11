@@ -7,6 +7,7 @@ module.exports = class ShortcutHandler {
   }
 
   initialize() {
+    console.log('initializing ShortcutHandler')
     chrome.commands.onCommand.addListener(this.onKeyboardShortcut.bind(this))
   }
 
@@ -16,7 +17,6 @@ module.exports = class ShortcutHandler {
         utils.getCurrentTab().then( (tab) => {
           this.broker.sendMessage({
             request: 'copyInFormat',
-            format: -1,
           }, tab, (response) => {
             if (response) {
               this.flashBadge('success', response.formatName);
@@ -48,20 +48,20 @@ module.exports = class ShortcutHandler {
         return; // don't know what it is. quit.
     }
 
-    chrome.browserAction.setBadgeText({
+    chrome.action.setBadgeText({
       "text": text
     });
 
-    chrome.browserAction.setBadgeBackgroundColor({
+    chrome.action.setBadgeBackgroundColor({
       "color": color
     });
 
     function clearBadge(type, text) {
-      chrome.browserAction.setBadgeText({
+      chrome.action.setBadgeText({
         text: ""
       });
 
-      chrome.browserAction.setBadgeBackgroundColor({
+      chrome.action.setBadgeBackgroundColor({
         color: [0, 0, 0, 255] // opaque
       });
     }

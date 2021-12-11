@@ -1,18 +1,18 @@
-
 const utils = require('./utils')
+const fmt = require('./formats');
+const CreateLink = require('./createlink');
 
 module.exports = class PopupHandler {
   initialize() {
     this.initializeMenuItems()
   }
 
-  initializeMenuItems() {
-    document.addEventListener( 'mouseup', this.onMouseUp.bind(this), false);
+  async initializeMenuItems() {
+    document.addEventListener('mouseup', this.onMouseUp.bind(this), false);
 
-    chrome.runtime.sendMessage({request: 'formats'}, (response) => {
-      var formats = response.formats
-      this.setupListItems(formats);
-    })
+    await fmt.load()
+    const formats = fmt.getFormats()
+    this.setupListItems(formats);
   }
 
   createListElement(id, text) {
@@ -27,35 +27,36 @@ module.exports = class PopupHandler {
     var listParent = document.getElementById("formatlist");
     var insertionPoint = document.getElementById("separator");
     var n = 0;
-    formats.map( (def) => {
+    formats.map((def) => {
       var id = "item" + n;
       var e = this.createListElement(id, def.label);
-        listParent.insertBefore(e, insertionPoint);
+      listParent.insertBefore(e, insertionPoint);
       n++;
-    } );
+    });
   }
 
   onMouseUp(ev) {
-    utils.getCurrentTab().then( (tab) => {
+    utils.getCurrentTab().then((tab) => {
       this.onMenuSelected(tab, ev.target.id);
     })
   }
 
-  onMenuSelected(tab, id) {
-    if ( id == 'configure' ) {
-      chrome.tabs.create({url:"options.html"});
+  async onMenuSelected(tab, id) {
+    if (id == 'configure') {
+      chrome.tabs.create({ url: "options.html" });
       window.close();
-    } else if ( id == 'separator' ) {
-      window.close();
-    } else if ( id.match(/^item(\d+)$/) ) {
-      var formatId = Number(RegExp.$1);
+    } else if (id == 'separator') {
+    } else if (id.match(/^item(\d+)$/)) {
+      var formatIndex = Number(RegExp.$1);
 
-      chrome.runtime.sendMessage({
-        request: 'copyInFormat',
-        format: formatId,
-      }, () => {
-        window.close()
-      })
+      const def = fmt.format(formatIndex)
+      const selectionText = await utils.getSelectionText(tab.id)
+      const text = selectionText || tab.title
+
+      const cl = new CreateLink()
+      const link = await cl.formatInTab(def, { selectionText }, tab)
+      utils.copyToClipboard(document, link)
+      window.close();
     }
   }
 }
