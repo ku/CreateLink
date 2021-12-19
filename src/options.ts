@@ -1,15 +1,18 @@
 
-const fmt = require('./formats')
+import fmt, { FormatDefinition } from './formats'
 
 class OptionsPage {
+  select: HTMLSelectElement
+  selectedFormatName: string
+
   async initialize() {
     await fmt.load()
     this.fillVersion()
 
-    const formats =  fmt.getFormats()
+    const formats = fmt.getFormats()
     const defaultFormatName = fmt.getDefaultFormatName()
 
-    this.select = document.getElementById("current-default-format");
+    this.select = document.getElementById("current-default-format") as HTMLSelectElement;
     this.selectedFormatName = defaultFormatName
 
     this.buildFormatOptions(formats, defaultFormatName);
@@ -24,7 +27,7 @@ class OptionsPage {
     }, false)
 
     document.getElementById("configure-shortcut").addEventListener('click', function () {
-      chrome.tabs.create({url:'chrome://extensions/configureCommands'});
+      chrome.tabs.create({ url: 'chrome://extensions/configureCommands' });
     }, false);
   }
 
@@ -34,8 +37,8 @@ class OptionsPage {
     version.innerText = manifest.version;
   }
 
-  setSelectedFormat(formatName) {
-    Array.from(this.select.options).some( (o) => {
+  setSelectedFormat(formatName: string) {
+    Array.from(this.select.options).some((o) => {
       if (o.value == formatName) {
         o.selected = true
         return true
@@ -43,34 +46,34 @@ class OptionsPage {
     })
   }
 
-  buildFormatOptions(formats, defaultFormatName) {
+  buildFormatOptions(formats: FormatDefinition[], defaultFormatName: string) {
     Array.from(this.select.options).forEach(o => o.parentNode.removeChild(o))
-    formats.forEach( (format, i) => {
+    formats.forEach((format, i) => {
       var o = document.createElement('option');
-      o.setAttribute('data-index', i);
+      o.setAttribute('data-index', String(i));
       o.textContent = format.label;
       this.select.appendChild(o);
     })
     this.setSelectedFormat(defaultFormatName)
   }
 
-  renameOption(newValue, oldValue) {
-    Array.prototype.slice.call(this.select.options).some( (o) => {
+  renameOption(newValue: string, oldValue: string) {
+    Array.from(this.select.options).some((o) => {
       if (o.value == oldValue) {
         o.textContent = newValue;
         return true;
       }
-    } )
+    })
   }
 
-  onRemoving(index) {
+  onRemoving(index: number) {
     this.select.removeChild(this.select.options[index]);
-    const selectedOption = Array.from(this.select.options).find( o => o.selected )
+    const selectedOption = Array.from(this.select.options).find(o => o.selected)
     this.selectedFormatName = selectedOption.value
     fmt.setDefaultFormatName(selectedOption.value)
   }
 
-  onUpdated(ctable, newValue, oldValue) {
+  onUpdated(ctable: any, newValue: string, oldValue: string) {
     var formats = ctable.formats();
 
     this.buildFormatOptions(formats, this.selectedFormatName);
@@ -80,12 +83,12 @@ class OptionsPage {
     chrome.runtime.sendMessage({ request: 'updateFormats', formats })
   }
 
-  setupTable(formats) {
+  setupTable(formats: FormatDefinition[]) {
     var ctable = new CocoaTable(formats, [
       'label', 'format', 'filter'
     ], {
       onRemoving: this.onRemoving.bind(this),
-      onUpdated: (newValue, oldValue) => {
+      onUpdated: (newValue: string, oldValue: string) => {
         this.onUpdated(ctable, newValue, oldValue)
       },
     });

@@ -1,8 +1,10 @@
 
-const utils = require("./utils")
+import { getCurrentTab } from './utils'
+import { MessageBroker } from './message-broker'
 
-module.exports = class ShortcutHandler {
-  constructor(broker) {
+export class ShortcutHandler {
+  broker: MessageBroker
+  constructor(broker: MessageBroker) {
     this.broker = broker
   }
 
@@ -11,20 +13,20 @@ module.exports = class ShortcutHandler {
     chrome.commands.onCommand.addListener(this.onKeyboardShortcut.bind(this))
   }
 
-  onKeyboardShortcut(command) {
+  onKeyboardShortcut(command: string) {
     switch (command) {
       case 'current-tab-link':
-        utils.getCurrentTab().then( (tab) => {
+        getCurrentTab().then( (tab) => {
           this.broker.sendMessage({
-            request: 'copyInFormat',
-          }, tab, (response) => {
+            type: 'copyInFormat',
+          }, (response) => {
             if (response) {
-              this.flashBadge('success', response.formatName);
+              this.flashBadge('success', response.text);
             } else {
               // User has never set the default or else the previously-defaulted
               //  format was probably removed, so let user know,
               //  but don't automatically reset the default for her/him
-              this.flashBadge('fail')
+              this.flashBadge('fail', '')
             }
           });
         });
@@ -32,7 +34,7 @@ module.exports = class ShortcutHandler {
     }
   }
 
-  flashBadge(type, text) {
+  flashBadge(type: string, text: string) {
     // Taken from https://github.com/chitsaou/copy-as-markdown/
     var color;
 
@@ -56,7 +58,7 @@ module.exports = class ShortcutHandler {
       "color": color
     });
 
-    function clearBadge(type, text) {
+    function clearBadge(type: string, text: string) {
       chrome.action.setBadgeText({
         text: ""
       });

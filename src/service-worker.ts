@@ -1,12 +1,13 @@
 
-const ShortcutHandler = require('./shortcut-handler')
-const ContextMenuHandler = require('./context-menu-handler')
-const CreateLink = require('./createlink')
-const MessageBroker = require('./message-broker')
-const utils = require("./utils")
-const fmt = require("./formats")
+import { ShortcutHandler } from './shortcut-handler'
+import { ContextMenuHandler } from './context-menu-handler'
+import { CreateLink } from './createlink'
+import { MessageBroker } from './message-broker'
+import fmt from './formats'
 
 class CreateLinkExtension {
+  createLink: CreateLink
+
   async startup() {
     this.createLink = new CreateLink()
 

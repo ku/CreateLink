@@ -1,36 +1,40 @@
-const CreateLink = require('./createlink')
-const utils = require('./utils')
-const fmt = require('./formats')
+import fmt, { FormatDefinition } from "./formats";
+import { MessageBroker } from './message-broker'
+import {CreateLink } from './createlink'
+import { sendMessageToTab } from './utils'
 
 // run in service worker context.
-module.exports = class ContextMenuHandler {
-  constructor(broker) {
-    this.contextMenuIdList = {};
+export class ContextMenuHandler {
+  broker: MessageBroker
+  contextMenuIdList: { [name: string]: number }
+
+  constructor(broker: MessageBroker) {
     this.broker = broker
+    this.contextMenuIdList = {};
   }
 
- initialize(formats) {
+ initialize(formats: FormatDefinition[]) {
    this.updateContextMenus(formats)
 
     chrome.contextMenus.onClicked.addListener(this.onMenuItemClicked.bind(this))
     chrome.runtime.onMessage.addListener(this.onMessage.bind(this))
   }
 
-  onMessage(request, sender, sendResponse) {
+  onMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: ((response?: any) => void)) {
     if (request.request == 'updateFormats') {
       // options page requests updating the items
       this.updateContextMenus(request.formats)
     }
   }
 
-  formatIndexOfMenuItemId(menuItemId) {
-    return this.contextMenuIdList[menuItemId]
+  formatIndexOfMenuItemId(menuItemId: string|number): number {
+    return this.contextMenuIdList[String(menuItemId)]
   }
 
   // callback function for contextMenus.onClicked cannot be an async function.
-  onMenuItemClicked(info, tab) {
-    utils.sendMessageToTab(tab.id, { type: 'ping' }).then(async (response) => {
-      if (response !== "pong") {
+  onMenuItemClicked(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+    sendMessageToTab(tab.id, { type: 'ping' }).then(async (response) => {
+      if (response && response.type !== "pong") {
         // Reload the tab. The tab might be opened before this extension is installed.
         // It should respond once it is reloaded.
         chrome.tabs.reload(tab.id)
@@ -41,12 +45,12 @@ module.exports = class ContextMenuHandler {
       const def = fmt.format(formatIndex)
       const cl = new CreateLink()
       cl.formatInTab(def, info, tab).then(link => {
-        utils.sendMessageToTab(tab.id, { type: 'copyToClipboard', link })
+        sendMessageToTab(tab.id, { type: 'copyToClipboard', link })
       })
     })
   }
 
-  updateContextMenus(formats) {
+  updateContextMenus(formats: FormatDefinition[]) {
     chrome.contextMenus.removeAll();
 
     if (formats.length == 1) {

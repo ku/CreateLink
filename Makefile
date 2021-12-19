@@ -1,17 +1,19 @@
 
 NAME=createlink
-EXTDIR=extension
 VERSION=$(shell plutil -convert json -r -o  -  ./extension/manifest.json | "grep" '"version"' | "egrep" -o '\w(\.\w+)+')
-DIRNAME=$(shell pwd)
+CWD=$(shell pwd)
 SRC="extension/js/popup.js"
-EXTENSIONDIR=extension
+EXT_DIRNAME=extension
+EXT_DIR=$(CWD)/$(EXT_DIRNAME)
 
-CRXMAKE_DIR=./crxmake
-TMPFILELIST=/tmp/filelist
+BUILD_DIR=$(CWD)/.build
+TMPFILELIST=$(BUILD_DIR)/filelist
 
 $(NAME)-$(VERSION).zip: $(SRC)
-	find "$(EXTENSIONDIR)" | sed 's/$(EXTENSIONDIR)/./' | grep -v .js.map > $(TMPFILELIST)
-	cd $(EXTENSIONDIR); cat $(TMPFILELIST) | zip -q $(DIRNAME)/$@ -@
+	'rm' $(BUILD_DIR)/$@
+	mkdir -p $(BUILD_DIR)
+	find "$(EXT_DIRNAME)" | sed 's/$(EXT_DIRNAME)/./' | grep -v .js.map > $(TMPFILELIST)
+	cd $(EXT_DIR); cat $(TMPFILELIST) | zip -q $(BUILD_DIR)/$@ -@
 
 $(SRC):
 	./node_modules/.bin/webpack --mode=production
@@ -20,4 +22,4 @@ watch:
 	./node_modules/.bin/webpack -w --mode=development
 
 clean:
-	rm $(NAME).crx $(NAME).zip
+	rm -rf .build/

@@ -1,25 +1,34 @@
 
-const utils = require('./utils')
-const fmt = require('./formats')
+import {showInputDialog, sendMessageToTab} from './utils'
+import fmt, { FormatDefinition } from './formats'
 
-class CreateLink {
+interface ClickContext {
+  selectionText?: string
+  pageUrl: string
+  linkUrl?: string
+  srcUrl?: string
+  mediaType?: string
+}
+
+
+export class CreateLink {
   constructor() {
   }
 
-  applyFilter(tabId, def, data) {
+  applyFilter(tabId: number, def: FormatDefinition, data: string): Promise<string> {
     if (def.filter) {
       var m = def.filter.match(/^s\/(.+?)\/(.*?)\/(\w*)$/);
       if (m) {
         var r = new RegExp(m[1], m[3]);
         data = data.replace(r, m[2]);
       } else {
-        return utils.sendMessageToTab(tabId, {type: 'evaluateFilter', code: def.filter, string: data})
+        return sendMessageToTab(tabId, { type: 'evaluateFilter', code: def.filter, string: data }).then( response => response.text )
       }
     }
     return Promise.resolve(data);
   }
 
-  formatLinkText(def, url, text, title, inputs) {
+  formatLinkText(def: FormatDefinition, url: string, text: string, title: string, inputs: string[]): string {
     text = text || ''
 
     var data = def.format.
@@ -41,18 +50,18 @@ class CreateLink {
     })
   }
 
-  getInputs(def, tabId) {
+  getInputs(def: FormatDefinition, tabId: number): Promise<string[]> {
     const m = def.format.match(/%input%/g)
     if (m) {
-      return Promise.all( m.map( () => {
-        return utils.showInputDialog(tabId)
-      }) )
+      return Promise.all(m.map(() => {
+        return showInputDialog(tabId).then(response => response.text)
+      }))
     } else {
       return Promise.resolve([])
     }
   }
 
-  async formatInTab(def, info, tab) {
+  async formatInTab(def: FormatDefinition, info: ClickContext, tab: chrome.tabs.Tab): Promise<string> {
     var url;
     if (info.mediaType === 'image') {
       url = info.srcUrl;
@@ -65,13 +74,13 @@ class CreateLink {
     return this.formatString(tab.id, def, url, text, title)
   }
 
-  async formatString(tabId, def, url, text, title) {
+  async formatString(tabId: number, def: FormatDefinition, url: string, text: string, title: string): Promise<string> {
     const inputs = await this.getInputs(def, tabId)
     const linkText = this.formatLinkText(def, url, text, title, inputs)
     return this.applyFilter(tabId, def, linkText)
   }
 
-  indexOfFormatByLabel(label) {
+  indexOfFormatByLabel(label: string): number {
     const formats = fmt.getFormats();
     for (var i = 0, len = formats.length; i < len; i++) {
       var item = formats[i];
@@ -84,21 +93,14 @@ class CreateLink {
   };
 }
 
-function escapeHTML(text) {
+function escapeHTML(text: string): string {
   return text ? text.replace(/[&<>'"]/g, convertHTMLChar) : text;
 }
-function convertHTMLChar(c) { return charMap[c]; }
-var charMap = {
+function convertHTMLChar(c: string): string { return charMap[c]; }
+const charMap: { [name: string]: string } = {
   '&': '&amp;',
   '<': '&lt;',
   '>': '&gt;',
   "'": '&apos;',
   '"': '&quot;'
 };
-function showPrompt(text, pos, subject) {
-  var msg = "Please enter the input text for \n" + subject;
-  var s = window.prompt(msg);
-  return (s === null) ? "" : s;
-}
-
-module.exports = CreateLink

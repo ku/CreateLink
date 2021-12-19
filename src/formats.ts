@@ -2,16 +2,25 @@
 const formatsKey = 'format_preferences';
 const defaultFormatKey = 'defaultFormat';
 
-class Format {
-  async load() {
+export interface FormatDefinition {
+  label: string
+  format: string
+  filter: string
+}
+
+export class Format {
+  defaultFormatName: string
+  formats: FormatDefinition[]
+
+  async load(): Promise<[string, FormatDefinition[]]> {
     return Promise.all([
-      new Promise(resolve => {
+      new Promise<string>(resolve => {
         chrome.storage.sync.get(defaultFormatKey, (v) => {
           this.defaultFormatName = (v[defaultFormatKey] || "Plain text")
           resolve(this.defaultFormatName)
         })
       }),
-      new Promise(resolve => {
+      new Promise<FormatDefinition[]>(resolve => {
         chrome.storage.sync.get(formatsKey, (v) => {
           this.formats = (v[formatsKey] || [
             { label: "Plain text", format: '%text% %url%' },
@@ -25,32 +34,32 @@ class Format {
     ])
   }
 
-  setDefaultFormatName(value) {
+  setDefaultFormatName(value: string) {
     this.defaultFormatName = value
     chrome.storage.sync.set({
       [defaultFormatKey]: value
     });
   };
 
-  getDefaultFormatName() {
+  getDefaultFormatName(): string {
     return this.defaultFormatName
   }
 
-  getDefaultFormat() {
+  getDefaultFormat(): FormatDefinition {
     const found = this.formats.find(f => {
       return f.label === this.defaultFormatName
     })
     return found || this.formats[0]
   }
-  getFormats() {
+  getFormats(): FormatDefinition[] {
     return this.formats
   }
-  format(index) {
+  format(index: number): FormatDefinition {
     return this.formats[index]
   }
 
 
-  setFormats(formats) {
+  setFormats(formats: FormatDefinition[]) {
     this.formats = formats
     chrome.storage.sync.set({
       [formatsKey]: formats
@@ -58,5 +67,5 @@ class Format {
   };
 }
 
-const f = new Format()
-module.exports = f
+const fmt = new Format()
+export default fmt

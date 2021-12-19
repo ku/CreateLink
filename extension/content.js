@@ -2,18 +2,18 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.type) {
     case 'ping':
-      return sendResponse('pong')
+      return sendResponse({type: 'pong'})
     case 'showInputDialog':
       const text = window.prompt("CreateLink needs your input");
-      return sendResponse(text);
+      return sendResponse({type: request.type, text});
     case 'selectedText':
       const s = document.getSelection()
-      return sendResponse(s ? s.toString() : '')
+      return sendResponse({ type: request.type, text: (s ? s.toString() : '')})
     case 'evaluateFilter':
       const f = new Function('s', request.code)
-      return sendResponse(f.call(null, request.string))
+      return sendResponse({ type: request.type, text: f.call(null, request.string)})
     case 'copyToClipboard':
-      copyToClipboard(request.link)
+      return sendResponse({ type: request.type, text: copyToClipboard(request.link) })
   }
 });
 
@@ -34,4 +34,5 @@ function copyToClipboard(text) {
   textarea.select()
   document.execCommand("copy");
   textarea.parentNode.removeChild(textarea)
+  return text
 }

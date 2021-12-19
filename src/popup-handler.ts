@@ -1,8 +1,12 @@
-const utils = require('./utils')
-const fmt = require('./formats');
-const CreateLink = require('./createlink');
+import { getCurrentTab, copyToClipboard, getSelectionText } from './utils'
+import fmt, { FormatDefinition } from './formats'
+import { CreateLink } from './createlink'
 
-module.exports = class PopupHandler {
+interface ContextMenuItem {
+  id: string
+}
+
+export class PopupHandler {
   initialize() {
     this.initializeMenuItems()
   }
@@ -15,7 +19,7 @@ module.exports = class PopupHandler {
     this.setupListItems(formats);
   }
 
-  createListElement(id, text) {
+  createListElement(id: string, text: string) {
     var e = document.createElement('li');
     e.setAttribute('class', "item");
     e.setAttribute('id', id);
@@ -23,7 +27,7 @@ module.exports = class PopupHandler {
     return e;
   }
 
-  setupListItems(formats) {
+  setupListItems(formats: FormatDefinition[]) {
     var listParent = document.getElementById("formatlist");
     var insertionPoint = document.getElementById("separator");
     var n = 0;
@@ -35,13 +39,17 @@ module.exports = class PopupHandler {
     });
   }
 
-  onMouseUp(ev) {
-    utils.getCurrentTab().then((tab) => {
-      this.onMenuSelected(tab, ev.target.id);
+  onMouseUp(ev: Event) {
+    getCurrentTab().then((tab: chrome.tabs.Tab) => {
+      if (ev.target === null) {
+        throw new Error("target is null")
+      }
+      const target = (ev.target as unknown) as ContextMenuItem
+      this.onMenuSelected(tab, target.id);
     })
   }
 
-  async onMenuSelected(tab, id) {
+  async onMenuSelected(tab: chrome.tabs.Tab, id: string) {
     if (id == 'configure') {
       chrome.tabs.create({ url: "options.html" });
       window.close();
@@ -50,12 +58,13 @@ module.exports = class PopupHandler {
       var formatIndex = Number(RegExp.$1);
 
       const def = fmt.format(formatIndex)
-      const selectionText = await utils.getSelectionText(tab.id)
-      const text = selectionText || tab.title
-
+      const response = await getSelectionText(tab.id)
       const cl = new CreateLink()
-      const link = await cl.formatInTab(def, { selectionText }, tab)
-      utils.copyToClipboard(document, link)
+      const link = await cl.formatInTab(def, {
+        selectionText: response.text,
+        pageUrl: tab.url,
+      }, tab)
+      copyToClipboard(document, link)
       window.close();
     }
   }

@@ -8,7 +8,7 @@
 	<script src="./js/options.js"></script>
 </head>
 <body>
-	<div id="about">
+	<section id="about">
     <div>
 		<img src="icon128.png" class="icon" width="128" height="128" />
     </div>
@@ -22,9 +22,9 @@
 				<li>Icons by <a href="http://icontoaster.com/?free-icons-for-all">icontoaster.com</a></li>
 			</ul>
 		</div>
-	</div>
+	</section>
 
-  <div>
+  <section>
     <h2>Default Format</h2>
     <p>Select the format from the table below that should be used when the keyboard shortcut is activated.</p>
     <!-- when table row is selected, show selection below  -->
@@ -32,9 +32,9 @@
     <p>
     <a href="#" id="configure-shortcut">Configure shortcut</a>
     </p>
-  </div>
+  </section>
 
-	<div id="configuration">
+	<section id="configuration">
     <h2>Formats</h2>
 		<table id="cocoatable" class="cocoatable">
 			<thead>
@@ -52,9 +52,9 @@
 			<div id="cocoatable-button-minus" class="button minus">-</div>
 			<div style="clear:both"><!-- --></div>
 		</div>
-	</div>
+	</section>
 
-  <div>
+  <section>
     <h2>Variables</h2>
     <div>
     Create Link recognizes some <a href="https://addons.mozilla.org/en/firefox/addon/142">Make Link</a> compatible variables.
@@ -77,15 +77,30 @@
       <dt>%input%</dt>
       <dd>Shows a dialog to input text.</dd>
     </dl>
-  </div>
+  </section>
 
-  <div>
+  <section>
+    <h2>Meta Characters</h2>
+    <div>
+      CreateLink supports following meta characters to put special characters.
+    </div>
+    <dl id="metachars">
+      <dt>\t</dt>
+      <dd>Tab character.</dd>
+      <dt>\n</dt>
+      <dd>New line. 0x0A Line Feed.</dd>
+      <dt>\r</dt>
+      <dd>0x0D Carriage Return.</dd>
+    </dl>
+  </section>
+
+  <section>
     <h2>Filter</h2>
     <div>
     <p>Filter must be specified in the following format (perl-like substitution operator): <code>s/<i>&lt;pattern&gt;</i>/<i>&lt;replacement&gt;</i>/<i>[&lt;flags&gt;]</i></code><br>
     Pattern is  regular expression and flags are either "g", "i", "m" or "y".</p>
     <p>For example, <code>s/\[at\]/@/gi</code> will replace all occurrences (g) of "[at]/[AT]/[At]/[aT]" case-insensitively (i) into "@".</p>
     </div>
-  </div>
+  </section>
 </body>
 </html>
