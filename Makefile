@@ -10,7 +10,6 @@ BUILD_DIR=$(CWD)/.build
 TMPFILELIST=$(BUILD_DIR)/filelist
 
 $(NAME)-$(VERSION).zip: $(SRC)
-	'rm' $(BUILD_DIR)/$@
 	mkdir -p $(BUILD_DIR)
 	find "$(EXT_DIRNAME)" | sed 's/$(EXT_DIRNAME)/./' | grep -v .js.map > $(TMPFILELIST)
 	cd $(EXT_DIR); cat $(TMPFILELIST) | zip -q $(BUILD_DIR)/$@ -@

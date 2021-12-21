@@ -21,7 +21,7 @@ export class ContextMenuHandler {
   }
 
   onMessage(request: any, sender: chrome.runtime.MessageSender, sendResponse: ((response?: any) => void)) {
-    if (request.request == 'updateFormats') {
+    if (request.type == 'updateFormats') {
       // options page requests updating the items
       this.updateContextMenus(request.formats)
     }

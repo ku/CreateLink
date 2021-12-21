@@ -1,9 +1,23 @@
 
 import fmt, { FormatDefinition } from './formats'
 
+function oldFormats(): FormatDefinition[] {
+  const prefs = localStorage.format_preferences
+  if (prefs) {
+    try {
+      const formats = JSON.parse(prefs)
+      return formats
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+}
+
 class OptionsPage {
   select: HTMLSelectElement
   selectedFormatName: string
+  ctable: any
 
   async initialize() {
     await fmt.load()
@@ -16,7 +30,30 @@ class OptionsPage {
     this.selectedFormatName = defaultFormatName
 
     this.buildFormatOptions(formats, defaultFormatName);
-    this.setupTable(formats);
+    this.ctable = this.setupTable(formats);
+
+    const _formats = oldFormats()
+    if (_formats) {
+      const e = document.getElementById('migrate')
+      if (e) {
+        e.style.display = 'block'
+        const ctable = this.ctable
+        e.addEventListener('click', () => {
+          let json = ctable.formats();
+          _formats.forEach((f) => {
+            json.push({
+              label: f.label + " - migrated",
+              format: f.format,
+              filter: f.filter,
+            })
+          })
+          fmt.setFormats(json)
+          alert("Please restart Chrome to add migrated items to context menu.")
+          location.reload()
+        }, false)
+      }
+    }
+
 
     this.select.addEventListener('change', (ev) => {
       var s = this.select;
@@ -80,11 +117,11 @@ class OptionsPage {
 
     this.renameOption(newValue, oldValue);
     fmt.setFormats(formats)
-    chrome.runtime.sendMessage({ request: 'updateFormats', formats })
+    chrome.runtime.sendMessage({ type: 'updateFormats', formats })
   }
 
-  setupTable(formats: FormatDefinition[]) {
-    var ctable = new CocoaTable(formats, [
+  setupTable(formats: FormatDefinition[]): any {
+    const ctable = new CocoaTable(formats, [
       'label', 'format', 'filter'
     ], {
       onRemoving: this.onRemoving.bind(this),
@@ -92,6 +129,7 @@ class OptionsPage {
         this.onUpdated(ctable, newValue, oldValue)
       },
     });
+    return ctable
   }
 }
 

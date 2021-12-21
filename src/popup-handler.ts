@@ -59,9 +59,13 @@ export class PopupHandler {
 
       const def = fmt.format(formatIndex)
       const response = await getSelectionText(tab.id)
+      let selectionText
+      if (response instanceof Object) {
+        selectionText = response.text
+      }
       const cl = new CreateLink()
       const link = await cl.formatInTab(def, {
-        selectionText: response.text,
+        selectionText,
         pageUrl: tab.url,
       }, tab)
       copyToClipboard(document, link)
