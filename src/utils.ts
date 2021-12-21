@@ -25,7 +25,15 @@ export function getCurrentTab(): Promise<chrome.tabs.Tab> {
 export function sendMessageToTab(tabId: number, message: Message): Promise<ResponseMessage | null> {
   return new Promise(function (resolve) {
     chrome.tabs.sendMessage(tabId, message, function (res) {
-      resolve(res);
+      if (!res && chrome.runtime.lastError) {
+        // Sometimes service worker does not respond and it says:
+        // Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
+        // In such cases, it seems the issue can be solved by sending the message once again.
+        // related to https://bugs.chromium.org/p/chromium/issues/detail?id=1271154 ?
+        console.log(chrome.runtime.lastError.message)
+        chrome.tabs.sendMessage(tabId, message, resolve)
+      }
+      resolve(res)
     });
   });
 }
