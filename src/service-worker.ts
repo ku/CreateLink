@@ -1,26 +1,35 @@
 
+import { Message, ResponseMessage, getSelectionText, getCurrentTab, sendMessageToTab } from './utils'
 import { ShortcutHandler } from './shortcut-handler'
 import { ContextMenuHandler } from './context-menu-handler'
-import { CreateLink } from './createlink'
-import { MessageBroker } from './message-broker'
 import fmt from './formats'
 
+type MessageResponder = ((response?: ResponseMessage) => void)
+
 class CreateLinkExtension {
-  createLink: CreateLink
-
   async startup() {
-    this.createLink = new CreateLink()
-
-    const broker = new MessageBroker(this.createLink);
-
-    (new ShortcutHandler(broker)).initialize();
-    await fmt.load()
-    const formats = fmt.getFormats();
-    (new ContextMenuHandler(broker).initialize(formats));
-    broker.initialize();
+    (new ShortcutHandler()).initialize();
   }
 }
 
 const app = new CreateLinkExtension()
 app.startup()
 
+
+chrome.runtime.onMessage.addListener(function (message: Message, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) {
+  console.log({ message })
+  switch (message.type) {
+    case 'updateFormats':
+      ContextMenuHandler.updateContextMenus()
+      break
+  }
+})
+
+
+chrome.contextMenus.onClicked.addListener( async function(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+  ContextMenuHandler.onMenuItemClicked(info, tab)
+})
+
+chrome.runtime.onInstalled.addListener(async function () {
+  ContextMenuHandler.updateContextMenus()
+})

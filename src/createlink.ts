@@ -1,5 +1,5 @@
 
-import {showInputDialog, sendMessageToTab} from './utils'
+import {showInputDialog, sendMessageToTab, ResponseMessage} from './utils'
 import fmt, { FormatDefinition } from './formats'
 
 interface ClickContext {
@@ -91,6 +91,10 @@ export class CreateLink {
     // use plain text as default format.
     return 1;
   };
+
+  copyToClipboard(tabId: number, link: string): Promise<ResponseMessage> {
+    return sendMessageToTab(tabId, { type: 'copyToClipboard', link })
+  }
 }
 
 function escapeHTML(text: string): string {

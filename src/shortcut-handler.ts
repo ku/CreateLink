@@ -1,35 +1,41 @@
 
-import { getCurrentTab } from './utils'
-import { MessageBroker } from './message-broker'
+import { getCurrentTab, getSelectionText, sendMessageToTab, copyToClipboard } from './utils'
+import { CreateLink } from './createlink'
+import fmt from './formats'
 
 export class ShortcutHandler {
-  broker: MessageBroker
-  constructor(broker: MessageBroker) {
-    this.broker = broker
-  }
 
   initialize() {
     console.log('initializing ShortcutHandler')
     chrome.commands.onCommand.addListener(this.onKeyboardShortcut.bind(this))
   }
 
-  onKeyboardShortcut(command: string) {
+  async onKeyboardShortcut(command: string) {
     switch (command) {
       case 'current-tab-link':
-        getCurrentTab().then( (tab) => {
-          this.broker.sendMessage({
-            type: 'copyInFormat',
-          }, (response) => {
-            if (response) {
-              this.flashBadge('success', response.text);
-            } else {
-              // User has never set the default or else the previously-defaulted
-              //  format was probably removed, so let user know,
-              //  but don't automatically reset the default for her/him
-              this.flashBadge('fail', '')
-            }
-          });
-        });
+        await fmt.load()
+        const def = fmt.getDefaultFormat()
+        const tab = await getCurrentTab()
+        const response = await getSelectionText(tab.id)
+
+        let selectionText
+        if (response instanceof Object) {
+          selectionText = response.text
+        }
+
+        const cl = new CreateLink()
+        const link = await cl.formatInTab(def, {
+          selectionText,
+          pageUrl: tab.url,
+        }, tab)
+        cl.copyToClipboard(tab.id, link).then(() => {
+          this.flashBadge('success', def.label);
+        }, () => {
+          // User has never set the default or else the previously-defaulted
+          //  format was probably removed, so let user know,
+          //  but don't automatically reset the default for her/him
+          this.flashBadge('fail', '')
+        })
         break;
     }
   }

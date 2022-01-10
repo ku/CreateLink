@@ -58,7 +58,6 @@ export class Format {
     return this.formats[index]
   }
 
-
   setFormats(formats: FormatDefinition[]) {
     this.formats = formats
     chrome.storage.sync.set({

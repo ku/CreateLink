@@ -23,17 +23,13 @@ export function getCurrentTab(): Promise<chrome.tabs.Tab> {
 }
 
 export function sendMessageToTab(tabId: number, message: Message): Promise<ResponseMessage | null> {
-  return new Promise(function (resolve) {
+  return new Promise(function (resolve, reject) {
     chrome.tabs.sendMessage(tabId, message, function (res) {
       if (!res && chrome.runtime.lastError) {
-        // Sometimes service worker does not respond and it says:
-        // Unchecked runtime.lastError: Could not establish connection. Receiving end does not exist.
-        // In such cases, it seems the issue can be solved by sending the message once again.
-        // related to https://bugs.chromium.org/p/chromium/issues/detail?id=1271154 ?
-        console.log(chrome.runtime.lastError.message)
-        chrome.tabs.sendMessage(tabId, message, resolve)
+        reject(chrome.runtime.lastError)
+      } else {
+        resolve(res)
       }
-      resolve(res)
     });
   });
 }
@@ -45,15 +41,24 @@ export function getSelectionText(tabId: number): Promise<ResponseMessage> {
   return sendMessageToTab(tabId, { type: 'selectedText' })
 }
 
+// This function does not work in service worker due to lack of ClipboardItem.
+// Need to run in content script.
 export function copyToClipboard(document: Document, text: string): Promise<void> {
-
-  const data = [new ClipboardItem({
-    'text/html': new Blob([text], { type: "text/html" }),
+  let itemParams: { [name: string]: Blob } = {
     'text/plain': new Blob([text], { type: "text/plain" }),
-  })];
+  }
 
-  return navigator.clipboard.write(data).then( () => {
-    console.log('copied', data)
+  // add text/html if the text looks like containing an anchor.
+  const div = document.createElement('div')
+  div.innerHTML = text
+  const a = div.querySelector('a')
+  if (a) {
+    itemParams['text/html'] = new Blob([text], { type: "text/html" })
+  }
+
+  const items = [new ClipboardItem(itemParams)];
+  return navigator.clipboard.write(items).then( () => {
+    console.log('copied', itemParams)
   }, (reason) => {
     console.log('Clipboard API failed', reason)
     copyToClipboardHTML(document, text)

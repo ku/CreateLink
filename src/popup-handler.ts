@@ -1,4 +1,4 @@
-import { getCurrentTab, copyToClipboard, getSelectionText } from './utils'
+import { getCurrentTab, getSelectionText } from './utils'
 import fmt, { FormatDefinition } from './formats'
 import { CreateLink } from './createlink'
 
@@ -68,7 +68,7 @@ export class PopupHandler {
         selectionText,
         pageUrl: tab.url,
       }, tab)
-      copyToClipboard(document, link)
+      cl.copyToClipboard(tab.id, link)
       window.close();
     }
   }
