@@ -45,7 +45,23 @@ export function getSelectionText(tabId: number): Promise<ResponseMessage> {
   return sendMessageToTab(tabId, { type: 'selectedText' })
 }
 
-export function copyToClipboard(document: Document, text: string) {
+export function copyToClipboard(document: Document, text: string): Promise<void> {
+
+  const data = [new ClipboardItem({
+    'text/html': new Blob([text], { type: "text/html" }),
+    'text/plain': new Blob([text], { type: "text/plain" }),
+  })];
+
+  return navigator.clipboard.write(data).then( () => {
+    console.log('copied', data)
+  }, (reason) => {
+    console.log('Clipboard API failed', reason)
+    copyToClipboardHTML(document, text)
+  })
+}
+
+// fall back if Clipboard API failed
+function copyToClipboardHTML(document: Document, text: string) {
   // it does not copy the text to clipboard if it's hidden completely by "display: none".
   const textarea = document.createElement('textarea')
   textarea.setAttribute('style', `
@@ -57,10 +73,11 @@ export function copyToClipboard(document: Document, text: string) {
       `)
   textarea.setAttribute('id', 'clipboard_object')
   document.body.appendChild(textarea)
-
-  textarea.value = text;
-  textarea.select();
+  textarea.appendChild(document.createTextNode(text))
+  textarea.select()
   document.execCommand("copy");
   textarea.parentNode.removeChild(textarea)
+  return text
 }
+
 

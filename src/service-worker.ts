@@ -18,18 +18,6 @@ class CreateLinkExtension {
     const formats = fmt.getFormats();
     (new ContextMenuHandler(broker).initialize(formats));
     broker.initialize();
-    this.initialize()
-  }
-
-  initialize() {
-    //document.addEventListener('copy', (ev) => {
-    //  ev.preventDefault();
-
-    //  const proxy = chrome.extension.getBackgroundPage().document.getElementById('clipboard_object')
-    //  var text = proxy.value;
-    //  ev.clipboardData.setData("text/plain", text);
-    //  ev.clipboardData.setData("text/html", text);
-    //}, true);
   }
 }
 

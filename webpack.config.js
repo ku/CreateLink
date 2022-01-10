@@ -11,6 +11,7 @@ module.exports = (env, argv) => {
       "service-worker": './src/service-worker.ts',
       "popup": './src/popup.ts',
       "options": './src/options.ts',
+      "content": './src/content.ts',
     },
     module: {
       rules: [

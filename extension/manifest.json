@@ -1,6 +1,6 @@
 {
    "name": "Create Link",
-   "version": "0.5.5",
+   "version": "0.5.6",
    "manifest_version": 3,
    "background": {
      "service_worker": "js/service-worker.js"
@@ -22,7 +22,7 @@
      "matches"    : ["http://*/*", "https://*/*", "file:///*/*"],
      "css"        : [],
      "js"         : [
-       "content.js"
+       "js/content.js"
      ],
      "run_at"     : "document_end",
      "all_frames" : false
