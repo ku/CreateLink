@@ -1,6 +1,6 @@
 {
    "name": "Create Link",
-   "version": "0.5.6",
+   "version": "0.5.7",
    "manifest_version": 3,
    "background": {
      "service_worker": "js/service-worker.js"

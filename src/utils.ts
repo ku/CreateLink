@@ -49,20 +49,25 @@ export function copyToClipboard(document: Document, text: string): Promise<void>
   }
 
   // add text/html if the text looks like containing an anchor.
-  const div = document.createElement('div')
-  div.innerHTML = text
-  const a = div.querySelector('a')
-  if (a) {
-    itemParams['text/html'] = new Blob([text], { type: "text/html" })
-  }
+  try {
+    const div = document.createElement('div')
+    div.innerHTML = text
+    const a = div.querySelector('a')
+    if (a) {
+      itemParams['text/html'] = new Blob([text], { type: "text/html" })
+    }
 
-  const items = [new ClipboardItem(itemParams)];
-  return navigator.clipboard.write(items).then( () => {
-    console.log('copied', itemParams)
-  }, (reason) => {
-    console.log('Clipboard API failed', reason)
-    copyToClipboardHTML(document, text)
-  })
+    const items = [new ClipboardItem(itemParams)];
+    return navigator.clipboard.write(items).then( () => {
+      console.log('copied', itemParams)
+    }, (reason) => {
+      console.log('Clipboard API failed', reason)
+      copyToClipboardHTML(document, text)
+    })
+  } catch(e) {
+      console.log("falling back to execCommand('copy')", e)
+      copyToClipboardHTML(document, text)
+  }
 }
 
 // fall back if Clipboard API failed
